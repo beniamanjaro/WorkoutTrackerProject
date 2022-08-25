@@ -49,7 +49,7 @@ namespace WorkoutTracker.Infrastructure.Repositories
         }
 
 
-        public void DeleteExerciseById(Exercise exercise)
+        public void DeleteExercise(Exercise exercise)
         {
             _workoutContext.Exercises.Remove(exercise);
         }

@@ -8,6 +8,6 @@
         Task<List<Exercise>> GetExercisesByCategory(string category);
         Task<List<Exercise>> GetAllExercises();
         Task UpdateExercise(Exercise exercise);
-        void DeleteExerciseById(Exercise exercise);
+        void DeleteExercise(Exercise exercise);
     }
 }
