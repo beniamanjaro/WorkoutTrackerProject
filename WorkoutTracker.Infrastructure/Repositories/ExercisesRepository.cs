@@ -25,9 +25,8 @@ namespace WorkoutTracker.Infrastructure.Repositories
         }
         public async Task<Exercise> GetExerciseById(int id)
         {
-            return await _workoutContext.Exercises
-                .DefaultIfEmpty()
-                .FirstOrDefaultAsync(e => e.Id == id);
+            return await _workoutContext.Exercises.Include(e => e.PrimaryMuscles)
+                .Include(e => e.SecondaryMuscles).FirstOrDefaultAsync(e => e.Id == id);
         }
 
         public async Task<Exercise> GetExerciseByName(string name)
@@ -45,7 +44,8 @@ namespace WorkoutTracker.Infrastructure.Repositories
         }
         public async Task<List<Exercise>> GetAllExercises()
         {
-            return await _workoutContext.Exercises.DefaultIfEmpty().ToListAsync();
+            return await _workoutContext.Exercises.Include(e => e.PrimaryMuscles)
+                .Include(e => e.SecondaryMuscles).ToListAsync();
         }
 
 
