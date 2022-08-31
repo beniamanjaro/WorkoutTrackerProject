@@ -19,7 +19,7 @@ namespace WorkoutTracker.Infrastructure.Repositories
             _workoutContext = context;
         }
 
-        public async Task<Routine> CreateRoutine(Routine routine)
+        public async Task<Routine> AddRoutine(Routine routine)
         {
             var newRoutine = await _workoutContext.Routines.AddAsync(routine);
             return newRoutine.Entity;
@@ -29,15 +29,14 @@ namespace WorkoutTracker.Infrastructure.Repositories
             return await _workoutContext.Routines.FirstOrDefaultAsync(e => e.Id == id);
         }
 
-        public async Task<List<Routine>> GetAllRoutines(int id)
+        public async Task<List<Routine>> GetAllRoutines()
         {
             return await _workoutContext.Routines.Include(r => r.WorkoutSets).DefaultIfEmpty().ToListAsync();
         }
 
-        public void DeleteRoutineById(int id)
+        public void DeleteRoutine(Routine routine)
         {
-            var routineToDelete = _workoutContext.Routines.First(r => r.Id == id);
-            _workoutContext.Routines.Remove(routineToDelete);
+            _workoutContext.Routines.Remove(routine);
         }
 
         public void UpdateRoutineById(int id, Routine routine)

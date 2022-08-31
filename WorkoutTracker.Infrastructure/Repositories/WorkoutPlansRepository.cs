@@ -9,7 +9,7 @@ using WorkoutTracker.Domain.Models;
 
 namespace WorkoutTracker.Infrastructure.Repositories
 {
-    public class WorkoutPlansRepository : IWorkoutPlanRepository
+    public class WorkoutPlansRepository : IWorkoutPlansRepository
     {
         WorkoutContext _workoutContext;
 
@@ -26,13 +26,21 @@ namespace WorkoutTracker.Infrastructure.Repositories
 
         public async Task<List<WorkoutPlan>> GetAllWorkoutPlans()
         {
-            var workoutPlans = await _workoutContext.WorkoutPlans.DefaultIfEmpty().ToListAsync();
+            var workoutPlans = await _workoutContext.WorkoutPlans.Include(w => w.Routines)
+                .ThenInclude(r => r.WorkoutSets)
+                .ThenInclude(ws => ws.Sets).ThenInclude(s => s.Exercise)
+                .ToListAsync();
+
             return workoutPlans;
         }
 
         public async Task<WorkoutPlan> GetWorkoutPlanById(int id)
         {
-            var workoutPlan = await _workoutContext.WorkoutPlans.FirstOrDefaultAsync(w => w.Id == id);
+            var workoutPlan = await _workoutContext.WorkoutPlans.Include(w => w.Routines)
+                .ThenInclude(r => r.WorkoutSets)
+                .ThenInclude(ws => ws.Sets).ThenInclude(s => s.Exercise)
+                .SingleOrDefaultAsync(w => w.Id == id);
+
             return workoutPlan;
         }
 
@@ -42,6 +50,7 @@ namespace WorkoutTracker.Infrastructure.Repositories
                 .Include(w => w.Routines).ThenInclude(r => r.WorkoutSets)
                 .ThenInclude(ws => ws.Sets).ThenInclude(s => s.Exercise)
                 .ToListAsync();
+
             return workoutPlans;
 
         }
