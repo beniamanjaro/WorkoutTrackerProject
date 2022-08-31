@@ -8,13 +8,11 @@ using WorkoutTracker.Domain.Models;
 
 namespace WorkoutTracker.Application.WorkoutPlans.Commands
 {
-    public class CreateWorkoutPlan : IRequest<int>
+    public class CreateWorkoutPlan : IRequest<WorkoutPlan>
     {
         public int UserId { get; set; }
         public string Name { get; set; }
         public int TimesPerWeek { get; set; }
         public ICollection<Routine> Routines { get; set; }
-  
-
     }
 }
