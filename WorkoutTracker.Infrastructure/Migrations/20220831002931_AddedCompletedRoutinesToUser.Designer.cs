@@ -12,8 +12,8 @@ using WorkoutTracker.Infrastructure;
 namespace WorkoutTracker.Infrastructure.Migrations
 {
     [DbContext(typeof(WorkoutContext))]
-    [Migration("20220823000547_init")]
-    partial class init
+    [Migration("20220831002931_AddedCompletedRoutinesToUser")]
+    partial class AddedCompletedRoutinesToUser
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -143,17 +143,17 @@ namespace WorkoutTracker.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CompletedRoutineId"), 1L, 1);
 
-                    b.Property<int?>("RoutineId")
-                        .IsRequired()
-                        .HasColumnType("int");
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
 
-                    b.Property<int?>("UserId")
+                    b.Property<string>("Name")
                         .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("CompletedRoutineId");
-
-                    b.HasIndex("RoutineId");
 
                     b.HasIndex("UserId");
 
@@ -168,7 +168,7 @@ namespace WorkoutTracker.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<int>("ExerciseId")
+                    b.Property<int?>("ExerciseId")
                         .HasColumnType("int");
 
                     b.Property<string>("Name")
@@ -232,7 +232,7 @@ namespace WorkoutTracker.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<int>("ExerciseId")
+                    b.Property<int?>("ExerciseId")
                         .HasColumnType("int");
 
                     b.Property<string>("Name")
@@ -333,7 +333,7 @@ namespace WorkoutTracker.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("SelectedWorkoutPlanId")
+                    b.Property<int?>("SelectedWorkoutPlanId")
                         .HasColumnType("int");
 
                     b.Property<string>("Username")
@@ -350,7 +350,6 @@ namespace WorkoutTracker.Infrastructure.Migrations
                             Id = 1,
                             Email = "email@gmail.com",
                             Password = "test123",
-                            SelectedWorkoutPlanId = 0,
                             Username = "test user"
                         });
                 });
@@ -397,10 +396,15 @@ namespace WorkoutTracker.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<int>("RoutineId")
+                    b.Property<int?>("CompletedRoutineId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("RoutineId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CompletedRoutineId");
 
                     b.HasIndex("RoutineId");
 
@@ -421,19 +425,11 @@ namespace WorkoutTracker.Infrastructure.Migrations
 
             modelBuilder.Entity("WorkoutTracker.Domain.Models.CompletedRoutine", b =>
                 {
-                    b.HasOne("WorkoutTracker.Domain.Models.Routine", "Routine")
-                        .WithMany()
-                        .HasForeignKey("RoutineId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.HasOne("WorkoutTracker.Domain.Models.User", "User")
-                        .WithMany()
+                        .WithMany("CompletedRoutines")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Routine");
 
                     b.Navigation("User");
                 });
@@ -442,9 +438,7 @@ namespace WorkoutTracker.Infrastructure.Migrations
                 {
                     b.HasOne("Exercise", "Exercise")
                         .WithMany("PrimaryMuscles")
-                        .HasForeignKey("ExerciseId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ExerciseId");
 
                     b.Navigation("Exercise");
                 });
@@ -464,9 +458,7 @@ namespace WorkoutTracker.Infrastructure.Migrations
                 {
                     b.HasOne("Exercise", "Exercise")
                         .WithMany("SecondaryMuscles")
-                        .HasForeignKey("ExerciseId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ExerciseId");
 
                     b.Navigation("Exercise");
                 });
@@ -501,11 +493,13 @@ namespace WorkoutTracker.Infrastructure.Migrations
 
             modelBuilder.Entity("WorkoutTracker.Domain.Models.WorkoutSet", b =>
                 {
+                    b.HasOne("WorkoutTracker.Domain.Models.CompletedRoutine", null)
+                        .WithMany("WorkoutSets")
+                        .HasForeignKey("CompletedRoutineId");
+
                     b.HasOne("WorkoutTracker.Domain.Models.Routine", "Routine")
                         .WithMany("WorkoutSets")
-                        .HasForeignKey("RoutineId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("RoutineId");
 
                     b.Navigation("Routine");
                 });
@@ -517,6 +511,11 @@ namespace WorkoutTracker.Infrastructure.Migrations
                     b.Navigation("SecondaryMuscles");
                 });
 
+            modelBuilder.Entity("WorkoutTracker.Domain.Models.CompletedRoutine", b =>
+                {
+                    b.Navigation("WorkoutSets");
+                });
+
             modelBuilder.Entity("WorkoutTracker.Domain.Models.Routine", b =>
                 {
                     b.Navigation("WorkoutSets");
@@ -524,6 +523,8 @@ namespace WorkoutTracker.Infrastructure.Migrations
 
             modelBuilder.Entity("WorkoutTracker.Domain.Models.User", b =>
                 {
+                    b.Navigation("CompletedRoutines");
+
                     b.Navigation("WorkoutPlans");
                 });
 

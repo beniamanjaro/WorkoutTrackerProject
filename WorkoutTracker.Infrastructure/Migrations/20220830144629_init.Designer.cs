@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WorkoutTracker.Infrastructure;
 
@@ -11,9 +12,10 @@ using WorkoutTracker.Infrastructure;
 namespace WorkoutTracker.Infrastructure.Migrations
 {
     [DbContext(typeof(WorkoutContext))]
-    partial class WorkoutContextModelSnapshot : ModelSnapshot
+    [Migration("20220830144629_init")]
+    partial class init
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -148,7 +150,7 @@ namespace WorkoutTracker.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("UserId")
+                    b.Property<int?>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("CompletedRoutineId");
@@ -424,10 +426,8 @@ namespace WorkoutTracker.Infrastructure.Migrations
             modelBuilder.Entity("WorkoutTracker.Domain.Models.CompletedRoutine", b =>
                 {
                     b.HasOne("WorkoutTracker.Domain.Models.User", "User")
-                        .WithMany("CompletedRoutines")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .WithMany()
+                        .HasForeignKey("UserId");
 
                     b.Navigation("User");
                 });
@@ -521,8 +521,6 @@ namespace WorkoutTracker.Infrastructure.Migrations
 
             modelBuilder.Entity("WorkoutTracker.Domain.Models.User", b =>
                 {
-                    b.Navigation("CompletedRoutines");
-
                     b.Navigation("WorkoutPlans");
                 });
 

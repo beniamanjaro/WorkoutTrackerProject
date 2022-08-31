@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -32,7 +33,7 @@ namespace WorkoutTracker.Infrastructure.Migrations
                     Username = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Password = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    SelectedWorkoutPlanId = table.Column<int>(type: "int", nullable: false)
+                    SelectedWorkoutPlanId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -46,7 +47,7 @@ namespace WorkoutTracker.Infrastructure.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ExerciseId = table.Column<int>(type: "int", nullable: false)
+                    ExerciseId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -55,8 +56,7 @@ namespace WorkoutTracker.Infrastructure.Migrations
                         name: "FK_PrimaryMuscles_Exercises_ExerciseId",
                         column: x => x.ExerciseId,
                         principalTable: "Exercises",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -66,7 +66,7 @@ namespace WorkoutTracker.Infrastructure.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ExerciseId = table.Column<int>(type: "int", nullable: false)
+                    ExerciseId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -75,8 +75,27 @@ namespace WorkoutTracker.Infrastructure.Migrations
                         name: "FK_SecondaryMuscle_Exercises_ExerciseId",
                         column: x => x.ExerciseId,
                         principalTable: "Exercises",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "CompletedRoutines",
+                columns: table => new
+                {
+                    CompletedRoutineId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UserId = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CompletedRoutines", x => x.CompletedRoutineId);
+                    table.ForeignKey(
+                        name: "FK_CompletedRoutines_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -122,48 +141,27 @@ namespace WorkoutTracker.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "CompletedRoutines",
-                columns: table => new
-                {
-                    CompletedRoutineId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    RoutineId = table.Column<int>(type: "int", nullable: false),
-                    UserId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_CompletedRoutines", x => x.CompletedRoutineId);
-                    table.ForeignKey(
-                        name: "FK_CompletedRoutines_Routines_RoutineId",
-                        column: x => x.RoutineId,
-                        principalTable: "Routines",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_CompletedRoutines_Users_UserId",
-                        column: x => x.UserId,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "WorkoutSets",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    RoutineId = table.Column<int>(type: "int", nullable: false)
+                    RoutineId = table.Column<int>(type: "int", nullable: true),
+                    CompletedRoutineId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_WorkoutSets", x => x.Id);
                     table.ForeignKey(
+                        name: "FK_WorkoutSets_CompletedRoutines_CompletedRoutineId",
+                        column: x => x.CompletedRoutineId,
+                        principalTable: "CompletedRoutines",
+                        principalColumn: "CompletedRoutineId");
+                    table.ForeignKey(
                         name: "FK_WorkoutSets_Routines_RoutineId",
                         column: x => x.RoutineId,
                         principalTable: "Routines",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -216,7 +214,7 @@ namespace WorkoutTracker.Infrastructure.Migrations
             migrationBuilder.InsertData(
                 table: "Users",
                 columns: new[] { "Id", "Email", "Password", "SelectedWorkoutPlanId", "Username" },
-                values: new object[] { 1, "email@gmail.com", "test123", 0, "test user" });
+                values: new object[] { 1, "email@gmail.com", "test123", null, "test user" });
 
             migrationBuilder.InsertData(
                 table: "PrimaryMuscles",
@@ -235,13 +233,13 @@ namespace WorkoutTracker.Infrastructure.Migrations
 
             migrationBuilder.InsertData(
                 table: "WorkoutSets",
-                columns: new[] { "Id", "RoutineId" },
-                values: new object[] { 1, 1 });
+                columns: new[] { "Id", "CompletedRoutineId", "RoutineId" },
+                values: new object[] { 1, null, 1 });
 
             migrationBuilder.InsertData(
                 table: "WorkoutSets",
-                columns: new[] { "Id", "RoutineId" },
-                values: new object[] { 2, 1 });
+                columns: new[] { "Id", "CompletedRoutineId", "RoutineId" },
+                values: new object[] { 2, null, 1 });
 
             migrationBuilder.InsertData(
                 table: "Sets",
@@ -254,11 +252,6 @@ namespace WorkoutTracker.Infrastructure.Migrations
                     { 4, 2, 5, 55, 2 },
                     { 5, 2, 5, 45, 2 }
                 });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_CompletedRoutines_RoutineId",
-                table: "CompletedRoutines",
-                column: "RoutineId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_CompletedRoutines_UserId",
@@ -296,6 +289,11 @@ namespace WorkoutTracker.Infrastructure.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_WorkoutSets_CompletedRoutineId",
+                table: "WorkoutSets",
+                column: "CompletedRoutineId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_WorkoutSets_RoutineId",
                 table: "WorkoutSets",
                 column: "RoutineId");
@@ -303,9 +301,6 @@ namespace WorkoutTracker.Infrastructure.Migrations
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "CompletedRoutines");
-
             migrationBuilder.DropTable(
                 name: "PrimaryMuscles");
 
@@ -320,6 +315,9 @@ namespace WorkoutTracker.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "WorkoutSets");
+
+            migrationBuilder.DropTable(
+                name: "CompletedRoutines");
 
             migrationBuilder.DropTable(
                 name: "Routines");
