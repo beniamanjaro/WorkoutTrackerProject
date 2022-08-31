@@ -10,9 +10,10 @@ namespace WorkoutTracker.Domain.Models
     public class CompletedRoutine
     {
         public int CompletedRoutineId { get; set; }
-        public int? RoutineId { get; set; }
-        public Routine Routine { get; set; }
-        public int? UserId { get; set; }
+        public string Name { get; set; }
+        public ICollection<WorkoutSet> WorkoutSets { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.Now.Date;
+        public int UserId { get; set; }
         public User User { get; set; }
 
     }
