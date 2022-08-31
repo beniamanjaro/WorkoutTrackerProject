@@ -85,16 +85,6 @@ namespace WorkoutTracker.Infrastructure
                  );
 
 
-            modelBuilder.Entity<CompletedRoutine>()
-                .HasOne(e => e.User)
-                .WithMany()
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<CompletedRoutine>()
-                .HasOne(e => e.Routine)
-                .WithMany()
-                .OnDelete(DeleteBehavior.Restrict);
-
 
 
 
