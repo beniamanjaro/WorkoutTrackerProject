@@ -10,16 +10,15 @@ namespace WorkoutTracker.Application.Exercises.Queries
 {
     public class GetAllExercisesHandler : IRequestHandler<GetAllExercises, IEnumerable<Exercise>>
     {
-        private readonly IExercisesRepository _repository;
-
-        public GetAllExercisesHandler(IExercisesRepository repository)
+        private readonly IUnitOfWork _unitOfWork;
+        public GetAllExercisesHandler(IUnitOfWork unitOfWork)
         {
-            _repository = repository;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task<IEnumerable<Exercise>> Handle(GetAllExercises request, CancellationToken cancellationToken)
         {
-            var result = await _repository.GetAllExercises();
+            var result = await _unitOfWork.ExercisesRepository.GetAllExercises();
             return result;
         }
     }
