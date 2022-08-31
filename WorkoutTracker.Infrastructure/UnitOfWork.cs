@@ -11,8 +11,9 @@ namespace WorkoutTracker.Infrastructure
     {
         private readonly WorkoutContext _dataContext;
         public UnitOfWork(WorkoutContext dataContext, IExercisesRepository exercisesRepository,
-            IRoutinesRepository routinesRepository, IWorkoutPlanRepository workoutPlansRepository,
-            IWorkoutSetsRepository workoutSetsRepository, ISetsRepository setsRepository, IUserRepository usersRepository)
+            IRoutinesRepository routinesRepository, IWorkoutPlansRepository workoutPlansRepository,
+            IWorkoutSetsRepository workoutSetsRepository, ISetsRepository setsRepository, IUserRepository usersRepository,
+            ICompletedRoutinesRepository completedRoutinesRepository )
         {
             _dataContext = dataContext;
             ExercisesRepository = exercisesRepository;
@@ -21,6 +22,7 @@ namespace WorkoutTracker.Infrastructure
             WorkoutSetsRepository = workoutSetsRepository;
             SetsRepository = setsRepository;
             UsersRepository = usersRepository;
+            CompletedRoutinesRepository = completedRoutinesRepository;
         }
 
 
@@ -28,13 +30,14 @@ namespace WorkoutTracker.Infrastructure
 
         public IRoutinesRepository RoutinesRepository { get; private set; }
 
-        public IWorkoutPlanRepository WorkoutPlansRepository { get; private set; }
+        public IWorkoutPlansRepository WorkoutPlansRepository { get; private set; }
 
         public IWorkoutSetsRepository WorkoutSetsRepository { get; private set; }
 
         public ISetsRepository SetsRepository { get; private set; }
 
         public IUserRepository UsersRepository { get; private set; }
+        public ICompletedRoutinesRepository CompletedRoutinesRepository { get; private set; }
 
         public async Task Save()
         {
