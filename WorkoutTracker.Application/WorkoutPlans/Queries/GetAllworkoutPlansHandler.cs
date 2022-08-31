@@ -19,7 +19,8 @@ namespace WorkoutTracker.Application.WorkoutPlans.Queries
 
         public async Task<IEnumerable<WorkoutPlan>> Handle(GetAllWorkoutPlans request, CancellationToken cancellationToken)
         {
-            return await _unitOfWork.WorkoutPlansRepository.GetAllWorkoutPlans();
+            var workoutPlans = await _unitOfWork.WorkoutPlansRepository.GetAllWorkoutPlans();
+            return workoutPlans;
 
         }
     }
