@@ -7,7 +7,7 @@ using WorkoutTracker.Domain.Models;
 
 namespace WorkoutTracker.Domain.Abstractions
 {
-    public interface IWorkoutPlanRepository
+    public interface IWorkoutPlansRepository
     {
         Task<WorkoutPlan> AddWorkoutPlan(WorkoutPlan workoutPlan);
         Task<WorkoutPlan> GetWorkoutPlanById(int id);
