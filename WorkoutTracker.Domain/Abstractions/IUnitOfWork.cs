@@ -10,10 +10,11 @@ namespace WorkoutTracker.Domain.Abstractions
     {
         public IExercisesRepository ExercisesRepository { get; }
         public IRoutinesRepository RoutinesRepository { get; }
-        public IWorkoutPlanRepository WorkoutPlansRepository { get; }
+        public IWorkoutPlansRepository WorkoutPlansRepository { get; }
         public IWorkoutSetsRepository WorkoutSetsRepository { get; }
         public ISetsRepository SetsRepository { get; }
         public IUserRepository UsersRepository { get; }
+        public ICompletedRoutinesRepository CompletedRoutinesRepository { get; }
         public Task Save();
 
 
