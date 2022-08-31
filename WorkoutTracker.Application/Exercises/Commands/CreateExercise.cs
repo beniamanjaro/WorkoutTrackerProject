@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace WorkoutTracker.Application.Exercises.Commands
 {
-    public class CreateExercise : IRequest<int>
+    public class CreateExercise : IRequest<Exercise>
     {
         public string Name { get; set; }
         public string Category { get; set; }
