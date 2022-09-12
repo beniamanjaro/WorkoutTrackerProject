@@ -1,7 +1,11 @@
 using MediatR;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
+using System.Text;
 using WorkoutTracker.Application.WorkoutPlans.Queries;
 using WorkoutTracker.Domain.Abstractions;
 using WorkoutTracker.Infrastructure;
@@ -30,6 +34,40 @@ builder.Services.AddScoped<ICompletedRoutinesRepository, CompletedRoutinesReposi
 builder.Services.AddDbContext<WorkoutContext>(options =>
 options.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
 
+builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
+{
+    options.Password.RequireDigit = true;
+    options.Password.RequireLowercase = true;
+    options.Password.RequiredLength = 5;
+}).AddEntityFrameworkStores<WorkoutContext>();
+
+builder.Services.AddAuthentication(auth =>
+{
+    auth.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    auth.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        RequireExpirationTime = true,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["AuthSettings:Key"])),
+        ValidateIssuerSigningKey = true,
+        ValidateIssuer = false,
+        ValidateAudience = false,
+    };
+});
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("CorsPolicy",
+        builder => builder
+            .AllowAnyMethod()
+            .AllowCredentials()
+            .SetIsOriginAllowed((host) => true)
+            .AllowAnyHeader());
+});
+
+
 builder.Services.AddMediatR(typeof(GetAllWorkoutPlans));
 builder.Services.AddAutoMapper(typeof(WorkoutPlanProfile));
 
@@ -45,8 +83,14 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseCors("CorsPolicy");
+
+app.UseAuthentication();
+
 app.UseAuthorization();
 
 app.MapControllers();
 
 app.Run();
+
+public partial class Program { }
