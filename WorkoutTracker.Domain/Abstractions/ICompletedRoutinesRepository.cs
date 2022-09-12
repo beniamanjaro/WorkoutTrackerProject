@@ -11,7 +11,8 @@ namespace WorkoutTracker.Domain.Abstractions
     {
         Task<CompletedRoutine> AddCompletedRoutine(CompletedRoutine completedRoutine);
         Task<CompletedRoutine> GetCompletedRoutineById(int id);
-        Task<List<CompletedRoutine>> GetWorkoutPlansByUser(int userId);
+        Task<List<CompletedRoutine>> GetCompletedRoutinesByUser(int userId);
+        Task<List<CompletedRoutine>> GetCompletedRoutinesByUserByTimeframe(int userId, int timeframeInMonths);
         Task UpdateCompletedRoutine(CompletedRoutine completedRoutine);
         void DeleteCompletedRoutine(CompletedRoutine completedRoutine);
 
