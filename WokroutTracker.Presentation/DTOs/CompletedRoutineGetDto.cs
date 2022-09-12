@@ -7,6 +7,6 @@ namespace WorkoutTracker.Presentation.DTOs
         public int CompletedRoutineId { get; set; }
         public string Name { get; set; }
         public DateTime CreatedAt { get; set; }
-        public ICollection<WorkoutSetGetDto> WorkoutSets { get; set; }
+        public RoutineGetDto Routine { get; set; }
     }
 }
