@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WorkoutTracker.Infrastructure;
 
@@ -11,9 +12,10 @@ using WorkoutTracker.Infrastructure;
 namespace WorkoutTracker.Infrastructure.Migrations
 {
     [DbContext(typeof(WorkoutContext))]
-    partial class WorkoutContextModelSnapshot : ModelSnapshot
+    [Migration("20220908122236_removeUserPassword")]
+    partial class removeUserPassword
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -385,10 +387,6 @@ namespace WorkoutTracker.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("IdentityId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<int?>("SelectedWorkoutPlanId")
                         .HasColumnType("int");
 
@@ -397,8 +395,6 @@ namespace WorkoutTracker.Infrastructure.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("IdentityId");
 
                     b.ToTable("Users");
                 });
@@ -562,17 +558,6 @@ namespace WorkoutTracker.Infrastructure.Migrations
                     b.Navigation("Exercise");
 
                     b.Navigation("WorkoutSet");
-                });
-
-            modelBuilder.Entity("WorkoutTracker.Domain.Models.User", b =>
-                {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "Identity")
-                        .WithMany()
-                        .HasForeignKey("IdentityId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Identity");
                 });
 
             modelBuilder.Entity("WorkoutTracker.Domain.Models.WorkoutPlan", b =>

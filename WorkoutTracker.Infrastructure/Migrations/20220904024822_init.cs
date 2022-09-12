@@ -79,26 +79,6 @@ namespace WorkoutTracker.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "CompletedRoutines",
-                columns: table => new
-                {
-                    CompletedRoutineId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UserId = table.Column<int>(type: "int", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_CompletedRoutines", x => x.CompletedRoutineId);
-                    table.ForeignKey(
-                        name: "FK_CompletedRoutines_Users_UserId",
-                        column: x => x.UserId,
-                        principalTable: "Users",
-                        principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
                 name: "WorkoutPlans",
                 columns: table => new
                 {
@@ -141,22 +121,43 @@ namespace WorkoutTracker.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "CompletedRoutines",
+                columns: table => new
+                {
+                    CompletedRoutineId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    RoutineId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CompletedRoutines", x => x.CompletedRoutineId);
+                    table.ForeignKey(
+                        name: "FK_CompletedRoutines_Routines_RoutineId",
+                        column: x => x.RoutineId,
+                        principalTable: "Routines",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.NoAction);
+                    table.ForeignKey(
+                        name: "FK_CompletedRoutines_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "WorkoutSets",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    RoutineId = table.Column<int>(type: "int", nullable: true),
-                    CompletedRoutineId = table.Column<int>(type: "int", nullable: true)
+                    RoutineId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_WorkoutSets", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_WorkoutSets_CompletedRoutines_CompletedRoutineId",
-                        column: x => x.CompletedRoutineId,
-                        principalTable: "CompletedRoutines",
-                        principalColumn: "CompletedRoutineId");
                     table.ForeignKey(
                         name: "FK_WorkoutSets_Routines_RoutineId",
                         column: x => x.RoutineId,
@@ -192,66 +193,10 @@ namespace WorkoutTracker.Infrastructure.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
-            migrationBuilder.InsertData(
-                table: "Exercises",
-                columns: new[] { "Id", "Category", "Equipment", "Name" },
-                values: new object[,]
-                {
-                    { 1, "Chest", "Bench, Barbell", "Bench Press" },
-                    { 2, "Chest", "Cable Machine", "Cable Crossover" },
-                    { 3, "Chest", "Bench, Dumbbells", "Dumbbell Flies" },
-                    { 4, "Chest", "Bench, Dumbbells", "Dumbbell Press" },
-                    { 5, "Chest", "Bench, Barbell", "Incline Benchpress" },
-                    { 6, "Chest", "Bench, Dumbbells", "Incline Dumbbell Press" },
-                    { 8, "Legs", "Barbell", "Squat" },
-                    { 9, "Legs", "", "Calf Raises" },
-                    { 10, "Legs", "Barbell", "Front Squat" },
-                    { 11, "Legs", "Leg Curls Machine", "Leg Curls" },
-                    { 12, "Legs", "Leg Extension Machine", "Leg Extensions" },
-                    { 13, "Legs", "Leg Press Machine", "Leg Press" }
-                });
-
-            migrationBuilder.InsertData(
-                table: "Users",
-                columns: new[] { "Id", "Email", "Password", "SelectedWorkoutPlanId", "Username" },
-                values: new object[] { 1, "email@gmail.com", "test123", null, "test user" });
-
-            migrationBuilder.InsertData(
-                table: "PrimaryMuscles",
-                columns: new[] { "Id", "ExerciseId", "Name" },
-                values: new object[] { 1, 1, "Chest" });
-
-            migrationBuilder.InsertData(
-                table: "WorkoutPlans",
-                columns: new[] { "Id", "Name", "TimesPerWeek", "UserId" },
-                values: new object[] { 1, "Push Pull Legs", 6, 1 });
-
-            migrationBuilder.InsertData(
-                table: "Routines",
-                columns: new[] { "Id", "DayOrderNumber", "Name", "WorkoutPlanId" },
-                values: new object[] { 1, 1, "Chest day", 1 });
-
-            migrationBuilder.InsertData(
-                table: "WorkoutSets",
-                columns: new[] { "Id", "CompletedRoutineId", "RoutineId" },
-                values: new object[] { 1, null, 1 });
-
-            migrationBuilder.InsertData(
-                table: "WorkoutSets",
-                columns: new[] { "Id", "CompletedRoutineId", "RoutineId" },
-                values: new object[] { 2, null, 1 });
-
-            migrationBuilder.InsertData(
-                table: "Sets",
-                columns: new[] { "Id", "ExerciseId", "NumberOfReps", "Weight", "WorkoutSetId" },
-                values: new object[,]
-                {
-                    { 1, 1, 8, 80, 1 },
-                    { 2, 1, 8, 70, 1 },
-                    { 3, 1, 8, 60, 1 },
-                    { 4, 2, 5, 55, 2 },
-                    { 5, 2, 5, 45, 2 }
-                });
+            migrationBuilder.CreateIndex(
+                name: "IX_CompletedRoutines_RoutineId",
+                table: "CompletedRoutines",
+                column: "RoutineId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_CompletedRoutines_UserId",
@@ -289,11 +234,6 @@ namespace WorkoutTracker.Infrastructure.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_WorkoutSets_CompletedRoutineId",
-                table: "WorkoutSets",
-                column: "CompletedRoutineId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_WorkoutSets_RoutineId",
                 table: "WorkoutSets",
                 column: "RoutineId");
@@ -301,6 +241,9 @@ namespace WorkoutTracker.Infrastructure.Migrations
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "CompletedRoutines");
+
             migrationBuilder.DropTable(
                 name: "PrimaryMuscles");
 
@@ -315,9 +258,6 @@ namespace WorkoutTracker.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "WorkoutSets");
-
-            migrationBuilder.DropTable(
-                name: "CompletedRoutines");
 
             migrationBuilder.DropTable(
                 name: "Routines");

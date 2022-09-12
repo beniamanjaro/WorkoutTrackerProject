@@ -12,8 +12,8 @@ using WorkoutTracker.Infrastructure;
 namespace WorkoutTracker.Infrastructure.Migrations
 {
     [DbContext(typeof(WorkoutContext))]
-    [Migration("20220830144629_init")]
-    partial class init
+    [Migration("20220908122848_addIdentityUser")]
+    partial class addIdentityUser
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -47,92 +47,204 @@ namespace WorkoutTracker.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Exercises");
+                });
 
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Category = "Chest",
-                            Equipment = "Bench, Barbell",
-                            Name = "Bench Press"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Category = "Chest",
-                            Equipment = "Cable Machine",
-                            Name = "Cable Crossover"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Category = "Chest",
-                            Equipment = "Bench, Dumbbells",
-                            Name = "Dumbbell Flies"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            Category = "Chest",
-                            Equipment = "Bench, Dumbbells",
-                            Name = "Dumbbell Press"
-                        },
-                        new
-                        {
-                            Id = 5,
-                            Category = "Chest",
-                            Equipment = "Bench, Barbell",
-                            Name = "Incline Benchpress"
-                        },
-                        new
-                        {
-                            Id = 6,
-                            Category = "Chest",
-                            Equipment = "Bench, Dumbbells",
-                            Name = "Incline Dumbbell Press"
-                        },
-                        new
-                        {
-                            Id = 8,
-                            Category = "Legs",
-                            Equipment = "Barbell",
-                            Name = "Squat"
-                        },
-                        new
-                        {
-                            Id = 9,
-                            Category = "Legs",
-                            Equipment = "",
-                            Name = "Calf Raises"
-                        },
-                        new
-                        {
-                            Id = 10,
-                            Category = "Legs",
-                            Equipment = "Barbell",
-                            Name = "Front Squat"
-                        },
-                        new
-                        {
-                            Id = 11,
-                            Category = "Legs",
-                            Equipment = "Leg Curls Machine",
-                            Name = "Leg Curls"
-                        },
-                        new
-                        {
-                            Id = 12,
-                            Category = "Legs",
-                            Equipment = "Leg Extension Machine",
-                            Name = "Leg Extensions"
-                        },
-                        new
-                        {
-                            Id = 13,
-                            Category = "Legs",
-                            Equipment = "Leg Press Machine",
-                            Name = "Leg Press"
-                        });
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("NormalizedName")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NormalizedName")
+                        .IsUnique()
+                        .HasDatabaseName("RoleNameIndex")
+                        .HasFilter("[NormalizedName] IS NOT NULL");
+
+                    b.ToTable("AspNetRoles", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("ClaimType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ClaimValue")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RoleId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("AspNetRoleClaims", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUser", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("AccessFailedCount")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<bool>("EmailConfirmed")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("LockoutEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTimeOffset?>("LockoutEnd")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("NormalizedEmail")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("NormalizedUserName")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("PasswordHash")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("PhoneNumberConfirmed")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("SecurityStamp")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("TwoFactorEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("UserName")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NormalizedEmail")
+                        .HasDatabaseName("EmailIndex");
+
+                    b.HasIndex("NormalizedUserName")
+                        .IsUnique()
+                        .HasDatabaseName("UserNameIndex")
+                        .HasFilter("[NormalizedUserName] IS NOT NULL");
+
+                    b.ToTable("AspNetUsers", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("ClaimType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ClaimValue")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("AspNetUserClaims", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
+                {
+                    b.Property<string>("LoginProvider")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ProviderKey")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ProviderDisplayName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("LoginProvider", "ProviderKey");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("AspNetUserLogins", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
+                {
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("RoleId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("UserId", "RoleId");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("AspNetUserRoles", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
+                {
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("LoginProvider")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Value")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("UserId", "LoginProvider", "Name");
+
+                    b.ToTable("AspNetUserTokens", (string)null);
                 });
 
             modelBuilder.Entity("WorkoutTracker.Domain.Models.CompletedRoutine", b =>
@@ -150,10 +262,15 @@ namespace WorkoutTracker.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("UserId")
+                    b.Property<int>("RoutineId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("CompletedRoutineId");
+
+                    b.HasIndex("RoutineId");
 
                     b.HasIndex("UserId");
 
@@ -180,14 +297,6 @@ namespace WorkoutTracker.Infrastructure.Migrations
                     b.HasIndex("ExerciseId");
 
                     b.ToTable("PrimaryMuscles");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            ExerciseId = 1,
-                            Name = "Chest"
-                        });
                 });
 
             modelBuilder.Entity("WorkoutTracker.Domain.Models.Routine", b =>
@@ -213,15 +322,6 @@ namespace WorkoutTracker.Infrastructure.Migrations
                     b.HasIndex("WorkoutPlanId");
 
                     b.ToTable("Routines");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            DayOrderNumber = 1,
-                            Name = "Chest day",
-                            WorkoutPlanId = 1
-                        });
                 });
 
             modelBuilder.Entity("WorkoutTracker.Domain.Models.SecondaryMuscle", b =>
@@ -273,48 +373,6 @@ namespace WorkoutTracker.Infrastructure.Migrations
                     b.HasIndex("WorkoutSetId");
 
                     b.ToTable("Sets");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            ExerciseId = 1,
-                            NumberOfReps = 8,
-                            Weight = 80,
-                            WorkoutSetId = 1
-                        },
-                        new
-                        {
-                            Id = 2,
-                            ExerciseId = 1,
-                            NumberOfReps = 8,
-                            Weight = 70,
-                            WorkoutSetId = 1
-                        },
-                        new
-                        {
-                            Id = 3,
-                            ExerciseId = 1,
-                            NumberOfReps = 8,
-                            Weight = 60,
-                            WorkoutSetId = 1
-                        },
-                        new
-                        {
-                            Id = 4,
-                            ExerciseId = 2,
-                            NumberOfReps = 5,
-                            Weight = 55,
-                            WorkoutSetId = 2
-                        },
-                        new
-                        {
-                            Id = 5,
-                            ExerciseId = 2,
-                            NumberOfReps = 5,
-                            Weight = 45,
-                            WorkoutSetId = 2
-                        });
                 });
 
             modelBuilder.Entity("WorkoutTracker.Domain.Models.User", b =>
@@ -329,9 +387,9 @@ namespace WorkoutTracker.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Password")
+                    b.Property<string>("IdentityId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<int?>("SelectedWorkoutPlanId")
                         .HasColumnType("int");
@@ -342,16 +400,9 @@ namespace WorkoutTracker.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users");
+                    b.HasIndex("IdentityId");
 
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Email = "email@gmail.com",
-                            Password = "test123",
-                            Username = "test user"
-                        });
+                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("WorkoutTracker.Domain.Models.WorkoutPlan", b =>
@@ -377,15 +428,6 @@ namespace WorkoutTracker.Infrastructure.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("WorkoutPlans");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Name = "Push Pull Legs",
-                            TimesPerWeek = 6,
-                            UserId = 1
-                        });
                 });
 
             modelBuilder.Entity("WorkoutTracker.Domain.Models.WorkoutSet", b =>
@@ -396,38 +438,82 @@ namespace WorkoutTracker.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<int?>("CompletedRoutineId")
-                        .HasColumnType("int");
-
                     b.Property<int?>("RoutineId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CompletedRoutineId");
-
                     b.HasIndex("RoutineId");
 
                     b.ToTable("WorkoutSets");
+                });
 
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            RoutineId = 1
-                        },
-                        new
-                        {
-                            Id = 2,
-                            RoutineId = 1
-                        });
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
+                {
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
+                {
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
+                {
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
+                {
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
+                {
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("WorkoutTracker.Domain.Models.CompletedRoutine", b =>
                 {
-                    b.HasOne("WorkoutTracker.Domain.Models.User", "User")
+                    b.HasOne("WorkoutTracker.Domain.Models.Routine", "Routine")
                         .WithMany()
-                        .HasForeignKey("UserId");
+                        .HasForeignKey("RoutineId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("WorkoutTracker.Domain.Models.User", "User")
+                        .WithMany("CompletedRoutines")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Routine");
 
                     b.Navigation("User");
                 });
@@ -469,13 +555,26 @@ namespace WorkoutTracker.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("WorkoutTracker.Domain.Models.WorkoutSet", null)
+                    b.HasOne("WorkoutTracker.Domain.Models.WorkoutSet", "WorkoutSet")
                         .WithMany("Sets")
                         .HasForeignKey("WorkoutSetId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Exercise");
+
+                    b.Navigation("WorkoutSet");
+                });
+
+            modelBuilder.Entity("WorkoutTracker.Domain.Models.User", b =>
+                {
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "Identity")
+                        .WithMany()
+                        .HasForeignKey("IdentityId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Identity");
                 });
 
             modelBuilder.Entity("WorkoutTracker.Domain.Models.WorkoutPlan", b =>
@@ -491,10 +590,6 @@ namespace WorkoutTracker.Infrastructure.Migrations
 
             modelBuilder.Entity("WorkoutTracker.Domain.Models.WorkoutSet", b =>
                 {
-                    b.HasOne("WorkoutTracker.Domain.Models.CompletedRoutine", null)
-                        .WithMany("WorkoutSets")
-                        .HasForeignKey("CompletedRoutineId");
-
                     b.HasOne("WorkoutTracker.Domain.Models.Routine", "Routine")
                         .WithMany("WorkoutSets")
                         .HasForeignKey("RoutineId");
@@ -509,11 +604,6 @@ namespace WorkoutTracker.Infrastructure.Migrations
                     b.Navigation("SecondaryMuscles");
                 });
 
-            modelBuilder.Entity("WorkoutTracker.Domain.Models.CompletedRoutine", b =>
-                {
-                    b.Navigation("WorkoutSets");
-                });
-
             modelBuilder.Entity("WorkoutTracker.Domain.Models.Routine", b =>
                 {
                     b.Navigation("WorkoutSets");
@@ -521,6 +611,8 @@ namespace WorkoutTracker.Infrastructure.Migrations
 
             modelBuilder.Entity("WorkoutTracker.Domain.Models.User", b =>
                 {
+                    b.Navigation("CompletedRoutines");
+
                     b.Navigation("WorkoutPlans");
                 });
 
