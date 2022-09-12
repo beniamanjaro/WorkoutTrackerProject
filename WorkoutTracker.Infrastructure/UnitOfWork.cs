@@ -37,6 +37,7 @@ namespace WorkoutTracker.Infrastructure
         public ISetsRepository SetsRepository { get; private set; }
 
         public IUserRepository UsersRepository { get; private set; }
+
         public ICompletedRoutinesRepository CompletedRoutinesRepository { get; private set; }
 
         public async Task Save()
