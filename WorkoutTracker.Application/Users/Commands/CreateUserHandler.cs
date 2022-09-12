@@ -19,7 +19,7 @@ namespace WorkoutTracker.Application.Users.Commands
         }
         public async Task<User> Handle(CreateUser request, CancellationToken cancellationToken)
         {
-            var savedUser = await _unitOfWork.UsersRepository.AddUser(new User {Username = request.Username, Email = request.Email, Password = request.Password  });
+            var savedUser = await _unitOfWork.UsersRepository.AddUser(new User {Username = request.Username, Email = request.Email  });
             await _unitOfWork.Save();
 
             return savedUser;
