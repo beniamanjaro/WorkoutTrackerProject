@@ -9,7 +9,7 @@ namespace WorkoutTracker.Presentation.Profiles
         public ExerciseProfile()
         {
             CreateMap<Exercise, ExerciseGetDto>();
-            CreateMap<ExercisePostDto, Exercise>();
+            CreateMap<ExercisePutPostDto, Exercise>();
             CreateMap<PrimaryMuscle, PrimaryMuscleGetDto>();
             CreateMap<SecondaryMuscle, SecondaryMuscleGetDto>();
         }

@@ -8,14 +8,14 @@ namespace WorkoutTracker.Presentation.Profiles
     {
         public WorkoutPlanProfile()
         {
-            CreateMap<WorkoutPlanPutPostDto, WorkoutPlan>();
+            CreateMap<WorkoutPlanPostDto, WorkoutPlan>();
             CreateMap<WorkoutPlan, WorkoutPlanGetDto>();
             CreateMap<Routine, RoutineGetDto>();
             CreateMap<WorkoutSet, WorkoutSetGetDto>();
             CreateMap<Set, SetGetDto>();
-            CreateMap<RoutinePostDto, Routine>();
-            CreateMap<WorkoutSetPostDto, WorkoutSet>();
-            CreateMap<SetPostDto, Set>();
+            CreateMap<RoutinePutPostDto, Routine>();
+            CreateMap<WorkoutSetPutPostDto, WorkoutSet>();
+            CreateMap<SetPutPostDto, Set>();
         }
     }
 }
