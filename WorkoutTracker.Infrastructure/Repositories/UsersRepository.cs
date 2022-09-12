@@ -26,12 +26,20 @@ namespace WorkoutTracker.Infrastructure.Repositories
 
         public async Task<List<User>> GetAllUsers()
         {
-            return await _workoutContext.Users.ToListAsync();
+            return await _workoutContext.Users.Include(u => u.WorkoutPlans)
+                .ToListAsync();
         }
 
         public async Task<User> GetUserById(int id)
         {
-            return await _workoutContext.Users.FirstOrDefaultAsync(u => u.Id == id);
+            return await _workoutContext.Users.Include(u => u.WorkoutPlans)
+                .FirstOrDefaultAsync(u => u.Id == id);
+        }
+
+        public async Task<User> GetUserByIdentityId(string id)
+        {
+            return await _workoutContext.Users.Include(u => u.WorkoutPlans)
+                .FirstOrDefaultAsync(u => u.IdentityId == id);
         }
 
         public async Task UpdateUser(User user)

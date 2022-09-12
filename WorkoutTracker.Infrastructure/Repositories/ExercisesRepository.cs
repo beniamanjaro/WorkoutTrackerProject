@@ -40,6 +40,8 @@ namespace WorkoutTracker.Infrastructure.Repositories
         {
             return await _workoutContext.Exercises
                 .Where(e => e.Category.ToLower() == category.ToLower())
+                .Include(e => e.PrimaryMuscles)
+                .Include(e => e.SecondaryMuscles)
                 .ToListAsync();
         }
         public async Task<List<Exercise>> GetAllExercises()

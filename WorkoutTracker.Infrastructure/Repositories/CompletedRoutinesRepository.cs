@@ -19,14 +19,18 @@ namespace WorkoutTracker.Infrastructure.Repositories
         }
         public async Task<CompletedRoutine> GetCompletedRoutineById(int id)
         {
-            var completedRoutine = await _workoutContext.CompletedRoutines.SingleOrDefaultAsync(cr => cr.CompletedRoutineId == id);
+            var completedRoutine = await _workoutContext.CompletedRoutines
+                .Include(cr => cr.Routine)
+                .ThenInclude(cr => cr.WorkoutSets).ThenInclude(ws => ws.Sets)
+                .ThenInclude(s => s.Exercise).SingleOrDefaultAsync(cr => cr.CompletedRoutineId == id);
             return completedRoutine;
         }
 
-        public async Task<List<CompletedRoutine>> GetWorkoutPlansByUser(int userId)
+        public async Task<List<CompletedRoutine>> GetCompletedRoutinesByUser(int userId)
         {
             var completedRoutines = await _workoutContext.CompletedRoutines.Where(cr => cr.UserId == userId)
-                .Include(cr => cr.WorkoutSets).ThenInclude(ws => ws.Sets)
+                .Include(cr => cr.Routine)
+                .ThenInclude(cr => cr.WorkoutSets).ThenInclude(ws => ws.Sets)
                 .ThenInclude(s => s.Exercise).ToListAsync();
             return completedRoutines;
         }
@@ -34,6 +38,17 @@ namespace WorkoutTracker.Infrastructure.Repositories
         {
             var completedRoutineToAdd = await _workoutContext.CompletedRoutines.AddAsync(completedRoutine);
             return completedRoutineToAdd.Entity;
+        }
+
+        public async Task<List<CompletedRoutine>> GetCompletedRoutinesByUserByTimeframe(int userId, int timeframeInMonths)
+        {
+            var completedRoutines = await _workoutContext.CompletedRoutines
+                .Where(cr => cr.UserId == userId)
+                .Where(cr => cr.CreatedAt > DateTime.Now.AddMonths(timeframeInMonths * -1))
+                .OrderByDescending(cr => cr.CreatedAt)
+                .ToListAsync();
+
+            return completedRoutines;
         }
 
         public void DeleteCompletedRoutine(CompletedRoutine completedRoutine)
