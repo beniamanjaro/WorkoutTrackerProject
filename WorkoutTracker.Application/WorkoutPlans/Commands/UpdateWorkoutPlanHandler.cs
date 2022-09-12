@@ -21,15 +21,11 @@ namespace WorkoutTracker.Application.WorkoutPlans.Commands
         public async Task<WorkoutPlan> Handle(UpdateWorkoutPlan request, CancellationToken cancellationToken)
         {
             var workoutPlanToUpdate = await _unitOfWork.WorkoutPlansRepository.GetWorkoutPlanById(request.Id);
-            if (request.Name != null)
-            {
-            workoutPlanToUpdate.Name = request.Name;
 
-            }
-            if(request.TimesPerWeek != 0)
-            {
+            workoutPlanToUpdate.Name = request.Name;
+            workoutPlanToUpdate.Routines = request.Routines.ToList();
+            workoutPlanToUpdate.UserId = request.UserId;
             workoutPlanToUpdate.TimesPerWeek = request.TimesPerWeek;
-            }
 
             await _unitOfWork.WorkoutPlansRepository.UpdateWorkoutPlan(workoutPlanToUpdate);
             await _unitOfWork.Save();

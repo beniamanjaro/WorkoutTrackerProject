@@ -11,7 +11,9 @@ namespace WorkoutTracker.Application.WorkoutPlans.Commands
     public class UpdateWorkoutPlan : IRequest<WorkoutPlan>
     {
         public int Id { get; set; }
+        public int UserId { get; set; }
         public string Name { get; set; }
         public int TimesPerWeek { get; set; }
+        public IEnumerable<Routine> Routines {get; set;}
     }
 }
