@@ -1,6 +1,6 @@
 ﻿namespace WorkoutTracker.Presentation.DTOs
 {
-    public class ExercisePostDto
+    public class ExercisePutPostDto
     {
         public string Name { get; set; }
         public string Category { get; set; }
