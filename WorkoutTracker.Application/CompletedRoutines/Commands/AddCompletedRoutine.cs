@@ -13,6 +13,6 @@ namespace WorkoutTracker.Application.CompletedRoutines.Commands
         public string Name { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public int UserId { get; set; }
-        public ICollection<WorkoutSet> WorkoutSets { get; set; }
+        public int RoutineId { get; set; }
     }
 }

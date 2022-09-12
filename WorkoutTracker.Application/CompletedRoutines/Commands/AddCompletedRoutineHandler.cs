@@ -23,7 +23,7 @@ namespace WorkoutTracker.Application.CompletedRoutines.Commands
             {
                 Name = request.Name,
                 UserId = request.UserId,
-                WorkoutSets = request.WorkoutSets,
+                RoutineId = request.RoutineId,
             });
 
             await _unitOfWork.Save();

@@ -19,7 +19,7 @@ namespace WorkoutTracker.Application.CompletedRoutines.Queries
         }
         public async Task<IEnumerable<CompletedRoutine>> Handle(GetCompletedRoutinesByUser request, CancellationToken cancellationToken)
         {
-            return await _unitOfWork.CompletedRoutinesRepository.GetWorkoutPlansByUser(request.UserId);
+            return await _unitOfWork.CompletedRoutinesRepository.GetCompletedRoutinesByUser(request.UserId);
         }
     }
 }
