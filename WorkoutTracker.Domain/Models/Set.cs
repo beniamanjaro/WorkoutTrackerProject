@@ -14,10 +14,11 @@ namespace WorkoutTracker.Domain.Models
         public int NumberOfReps { get; set; }
         public int Weight { get; set; }
         public int WorkoutSetId { get; set; }
+        public WorkoutSet WorkoutSet { get; set; }
 
         public override string ToString()
         {
-            return $"{Exercise.Name} | {NumberOfReps | Weight}";
+            return $" | {NumberOfReps | Weight}";
         }
 
     }

@@ -13,5 +13,10 @@ namespace WorkoutTracker.Domain.Models
         public int? ExerciseId { get; set; }
         public Exercise Exercise { get; set; }
 
+        public override string ToString()
+        {
+            return $"{Name}";
+        }
+
     }
 }

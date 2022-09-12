@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Identity;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
@@ -12,10 +13,12 @@ namespace WorkoutTracker.Domain.Models
         public int Id { get; set; }
         public string Username { get; set; }
         public string Email { get; set; }
-        public string Password { get; set; }
         public int? SelectedWorkoutPlanId { get; set; }
         public ICollection<WorkoutPlan> WorkoutPlans { get; set; }
         public ICollection<CompletedRoutine> CompletedRoutines { get; set; }
+        public IdentityUser Identity {get; set;}
+        public string IdentityId {get; set; }
+
     }
 }
 
