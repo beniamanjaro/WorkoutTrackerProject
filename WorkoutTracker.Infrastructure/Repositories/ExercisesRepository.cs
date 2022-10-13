@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WorkoutTracker.Domain.Abstractions;
+using WorkoutTracker.Domain.Models;
 
 namespace WorkoutTracker.Infrastructure.Repositories
 {
@@ -23,31 +24,58 @@ namespace WorkoutTracker.Infrastructure.Repositories
             var newExercise = await _workoutContext.Exercises.AddAsync(exercise);
             return newExercise.Entity;
         }
+
+        public async Task<List<Exercise>> AddExercises(List<Exercise> exercises)
+        {
+            _workoutContext.Exercises.AddRange(exercises);
+            return exercises;
+        }
+
         public async Task<Exercise> GetExerciseById(int id)
         {
-            return await _workoutContext.Exercises.Include(e => e.PrimaryMuscles)
-                .Include(e => e.SecondaryMuscles).FirstOrDefaultAsync(e => e.Id == id);
+            return await _workoutContext.Exercises.FirstOrDefaultAsync(e => e.Id == id);
         }
 
-        public async Task<Exercise> GetExerciseByName(string name)
+        public async Task<List<Exercise>> GetExercisesByName(string name, PaginationFilter paginationFilter)
         {
-            return await _workoutContext.Exercises
-                .DefaultIfEmpty()
-                .FirstOrDefaultAsync(e => e.Name == name);
-        }
+            var skip = (paginationFilter.PageNumber - 1) * paginationFilter.PageSize;
 
-        public async Task<List<Exercise>> GetExercisesByCategory(string category)
-        {
+
             return await _workoutContext.Exercises
-                .Where(e => e.Category.ToLower() == category.ToLower())
-                .Include(e => e.PrimaryMuscles)
-                .Include(e => e.SecondaryMuscles)
+                .Where(e => e.Name.ToLower()
+                .Contains(name)).Skip(skip)
+                .Take(paginationFilter.PageSize)
                 .ToListAsync();
         }
-        public async Task<List<Exercise>> GetAllExercises()
+
+        public async Task<List<Exercise>> GetExercisesByCategory(string category, PaginationFilter paginationFilter)
         {
-            return await _workoutContext.Exercises.Include(e => e.PrimaryMuscles)
-                .Include(e => e.SecondaryMuscles).ToListAsync();
+            var skip = (paginationFilter.PageNumber - 1) * paginationFilter.PageSize;
+
+            return await _workoutContext.Exercises
+                .Where(e => e.Category.ToLower() == category.ToLower())
+                .Skip(skip)
+                .Take(paginationFilter.PageSize)
+                .ToListAsync();
+        }
+
+        public async Task<IList<ExerciseNameResponse>> GetExercisesNames()
+        {
+            return await _workoutContext.Exercises
+                .Select(e => new ExerciseNameResponse { Name = e.Name, Id = e.Id})
+                .Distinct().ToListAsync();
+        }
+        public async Task<List<string>> GetExercisesCategories()
+        {
+            return await _workoutContext.Exercises
+                .Select(e => e.Category)
+                .Distinct().ToListAsync();
+        }
+        public async Task<List<Exercise>> GetAllExercises(PaginationFilter paginationFilter)
+        {
+            var skip = (paginationFilter.PageNumber - 1) * paginationFilter.PageSize;
+
+            return await _workoutContext.Exercises.Skip(skip).Take(paginationFilter.PageSize).ToListAsync();
         }
 
 
@@ -61,6 +89,5 @@ namespace WorkoutTracker.Infrastructure.Repositories
             _workoutContext.Exercises.Update(exercise);
         }
 
-        
     }
 }

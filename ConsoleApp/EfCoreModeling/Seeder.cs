@@ -28,7 +28,7 @@ namespace ConsoleApp.EfCoreModeling
             var routines = GetPreConfiguredRoutines(workoutPlans).ToList();
             var workoutSets = GetPreConfiguredWorkoutSets(routines).ToList();
             var sets = GetPreConfiguredSets(workoutSets, exercises).ToList();
-            var completedRoutines = GetPreConfiguredCompletedRoutines(users, routines).ToList();
+            //var completedRoutines = GetPreConfiguredCompletedRoutines(users, routines).ToList();
 
             context.Exercises.AddRange(exercises);
             context.Users.AddRange(users);
@@ -36,7 +36,7 @@ namespace ConsoleApp.EfCoreModeling
             context.Routines.AddRange(routines);
             context.WorkoutSets.AddRange(workoutSets);
             context.Sets.AddRange(sets);
-            context.CompletedRoutines.AddRange(completedRoutines);
+            //context.CompletedRoutines.AddRange(completedRoutines);
 
             await context.SaveChangesAsync();
         }
@@ -95,7 +95,7 @@ namespace ConsoleApp.EfCoreModeling
             var fakeWorkoutPlans = Enumerable
                 .Range(1, rnd.Next(3, 6))
                 .Select(_ => new Faker<WorkoutPlan>()
-                .RuleFor(workoutPlan => workoutPlan.User, faker => faker.PickRandom(users))
+                .RuleFor(workoutPlan => workoutPlan.Users, faker => new List<User>() { faker.PickRandom(users) })
                 .RuleFor(workoutPlan => workoutPlan.TimesPerWeek, faker => faker.PickRandom(1, 5))
                 .RuleFor(workoutPlan => workoutPlan.Name, faker => faker.Lorem.Word())
                 .Generate());
@@ -109,10 +109,10 @@ namespace ConsoleApp.EfCoreModeling
 
             var fakeRoutines = Enumerable
                 .Range(1, rnd.Next(10, 15))
-                .Select(_ => new Faker<Routine>()
-                .RuleFor(routine => routine.WorkoutPlan, workoutPlans[rnd.Next(1, workoutPlans.Count - 1)])
+                .Select((Func<int, Routine>)(_ => new Faker<Routine>()
+                .RuleFor<WorkoutPlan>(routine => routine.WorkoutPlan, workoutPlans[rnd.Next(1, workoutPlans.Count - 1)])
                 .RuleFor(routine => routine.DayOrderNumber, faker => faker.PickRandom(1, 6))
-                .RuleFor(routine => routine.Name, faker => faker.Lorem.Word()).Generate());
+                .RuleFor<string>(routine => routine.Name, faker => faker.Lorem.Word()).Generate()));
 
 
             return fakeRoutines;
@@ -152,22 +152,22 @@ namespace ConsoleApp.EfCoreModeling
 
         }
 
-        public static IEnumerable<CompletedRoutine> GetPreConfiguredCompletedRoutines(List<User> users, List<Routine> routines)
-        {
-            var rnd = new Random();
+        //public static IEnumerable<CompletedRoutine> GetPreConfiguredCompletedRoutines(List<User> users, List<Routine> routines)
+        //{
+        //    var rnd = new Random();
 
 
-            var fakeCompletedRoutines = Enumerable.Range(1, 10)
-                .Select(_ => new Faker<CompletedRoutine>()
-                .RuleFor(completedRoutine => completedRoutine.User, faker => faker.PickRandom(users))
-                .RuleFor(completedRoutine => completedRoutine.Name, faker => faker.Lorem.Word())
-                .RuleFor(completedRoutine => completedRoutine.Routine, faker => faker.PickRandom(routines))
-                .RuleFor(completedRoutine => completedRoutine.CreatedAt, faker => faker.Date.Between(DateTime.Now.AddMonths(-3), DateTime.Now))
-                .Generate()
-                );
+        //    //var fakeCompletedRoutines = Enumerable.Range(1, 10)
+        //    //    .Select(_ => new Faker<CompletedRoutine>()
+        //    //    .RuleFor(completedRoutine => completedRoutine.User, faker => faker.PickRandom(users))
+        //    //    .RuleFor(completedRoutine => completedRoutine.Name, faker => faker.Lorem.Word())
+        //    //    .RuleFor(completedRoutine => completedRoutine.Routine, faker => faker.PickRandom(routines))
+        //    //    .RuleFor(completedRoutine => completedRoutine.CreatedAt, faker => faker.Date.Between(DateTime.Now.AddMonths(-3), DateTime.Now))
+        //    //    .Generate()
+        //    //    );
 
-            return fakeCompletedRoutines;
-        }
+        //    return fakeCompletedRoutines;
+        //}
 
         
 

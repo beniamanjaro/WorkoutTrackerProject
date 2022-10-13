@@ -25,10 +25,22 @@ namespace WorkoutTracker.Application.Users.Commands
             var userToDelete = await _unitOfWork.UsersRepository.GetUserById(request.Id);
             if (userToDelete == null) return null;
 
+            var workoutPlans = await _unitOfWork.WorkoutPlansRepository.GetWorkoutPlansByUser(request.Id);
+            foreach(var workoutPlan in workoutPlans)
+            {
+                _unitOfWork.WorkoutPlansRepository.DeleteWorkoutPlan(workoutPlan);
+            }
+
+            var subscribedWorkoutPlans = await _unitOfWork.WorkoutPlansRepository.GetWorkoutPlansSubscriptionsByUser(request.Id);
+            foreach(var workout in subscribedWorkoutPlans)
+            {
+                workout.Users.Remove(userToDelete);
+            }
+
+            await _unitOfWork.UsersRepository.DeleteUser(userToDelete);
             var userIdentityToDelete = await _userManager.FindByEmailAsync(userToDelete.Email);
             await _userManager.DeleteAsync(userIdentityToDelete);
 
-            _unitOfWork.UsersRepository.DeleteUser(userToDelete);
             await _unitOfWork.Save();
 
             return userToDelete;

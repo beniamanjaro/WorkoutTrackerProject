@@ -7,9 +7,11 @@ using WorkoutTracker.Application.CompletedRoutines.Queries;
 using WorkoutTracker.Application.Stats.Queries;
 using WorkoutTracker.Application.Users.Commands;
 using WorkoutTracker.Application.Users.Queries;
+using WorkoutTracker.Application.WorkoutPlans.Commands;
 using WorkoutTracker.Application.WorkoutPlans.Queries;
 using WorkoutTracker.Domain.Models;
 using WorkoutTracker.Presentation.DTOs;
+using WorkoutTracker.Presentation.Responses;
 
 namespace WorkoutTracker.Presentation.Controllers
 {
@@ -146,6 +148,64 @@ namespace WorkoutTracker.Presentation.Controllers
         }
 
         [HttpGet]
+        [Route("{userId}/analytics/completed-exercises")]
+        public async Task<IActionResult> GetUserCompletedExercisesByMuscleGroup(int userId)
+        {
+            _logger.LogInformation("Getting the stats for the user with the id {0}", userId);
+
+            var stats = await _mediator.Send(new GetExercisesByMuscleGroup { UserId = userId });
+            if (stats == null)
+            {
+                _logger.LogError("Couldn't get the stats for the user with the id {0}", userId);
+                return NotFound();
+            }
+
+            _logger.LogInformation("Successfully retrieved the stats");
+
+
+            return Ok(stats);
+        }
+
+        [HttpGet]
+        [Route("{userId}/analytics/most-used-exercises")]
+        public async Task<IActionResult> GetMostUsedExercises(int userId, int size)
+        {
+            _logger.LogInformation("Getting the stats for the user with the id {0}", userId);
+
+            var stats = await _mediator.Send(new GetTopMostUsedExercises { UserId = userId, Size = size });
+            if (stats == null)
+            {
+                _logger.LogError("Couldn't get the stats for the user with the id {0}", userId);
+                return NotFound();
+            }
+
+            _logger.LogInformation("Successfully retrieved the stats");
+
+
+            return Ok(stats);
+        }
+
+        [HttpGet]
+        [Route("{userId}/analytics/most-used-workout-plans")]
+        public async Task<IActionResult> GetMostUsedWorkoutPlans(int userId, int size)
+        {
+            _logger.LogInformation("Getting the stats for the user with the id {0}", userId);
+
+            var stats = await _mediator.Send(new GetTopMostUsedWorkoutPlans { UserId = userId, Size = size });
+            if (stats == null)
+            {
+                _logger.LogError("Couldn't get the stats for the user with the id {0}", userId);
+                return NotFound();
+            }
+
+            _logger.LogInformation("Successfully retrieved the stats");
+            
+
+
+            return Ok(stats);
+        }
+
+        [HttpGet]
         [Route("{userId}/analytics/{exercise-name}")]
         public async Task<IActionResult> GetExerciseStatsByUserByName(int userId, string exerciseName)
         {
@@ -161,6 +221,44 @@ namespace WorkoutTracker.Presentation.Controllers
             _logger.LogInformation("Successfully retrieved the stats for the exercise");
 
             return Ok(stats);
+        }
+
+        [HttpPut]
+        [Route("{userId}/workout-plans/subscribe")]
+        public async Task<IActionResult> AddWorkoutPlanToUser(int workoutPlanId, int userId)
+        {
+            _logger.LogInformation("Subscribing user {1} to workout plan {0}", workoutPlanId, userId);
+
+            var workoutPlanToAdd = await _mediator.Send(new AddWorkoutPlanToUser { WorkoutPlanId = workoutPlanId, UserId = userId});
+            if (workoutPlanToAdd == null)
+            {
+                _logger.LogError("Couldn't get the workout plan {0} for the user with the id {1}", workoutPlanId, userId);
+                return NotFound();  
+            }
+
+            _logger.LogInformation("Successfully subscribed to the workout plan");
+            var mappedResult = _mapper.Map<WorkoutPlanGetDto>(workoutPlanToAdd);
+
+            return Ok(mappedResult);
+        }
+
+        [HttpPut]
+        [Route("{userId}/workout-plans/unsubscribe")]
+        public async Task<IActionResult> RemoveWorkoutPlanFromUser(int workoutPlanId, int userId)
+        {
+            _logger.LogInformation("Unsubscribing user {1} from workout plan {0}", workoutPlanId, userId);
+
+            var workoutPlanToRemove = await _mediator.Send(new UnsubscribeFromWorkoutPlan { WorkoutPlanId = workoutPlanId, UserId = userId });
+            if (workoutPlanToRemove == null)
+            {
+                _logger.LogError("Couldn't get the workout plan {0} for the user with the id {1}", workoutPlanId, userId);
+                return NotFound();
+            }
+
+            _logger.LogInformation("Successfully unsubscribed from the workout plan");
+            var mappedResult = _mapper.Map<WorkoutPlanGetDto>(workoutPlanToRemove);
+
+            return Ok(mappedResult);
         }
 
         [HttpDelete]

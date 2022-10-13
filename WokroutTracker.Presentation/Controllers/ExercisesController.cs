@@ -5,7 +5,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using WorkoutTracker.Application.Exercises.Commands;
 using WorkoutTracker.Application.Exercises.Queries;
+using WorkoutTracker.Domain.Models;
 using WorkoutTracker.Presentation.DTOs;
+using WorkoutTracker.Presentation.Responses;
 
 namespace WorkoutTracker.Presentation.Controllers
 {
@@ -27,17 +29,49 @@ namespace WorkoutTracker.Presentation.Controllers
 
 
         [HttpGet]
-        public async Task<IActionResult> GetAllExercises()
+        public async Task<IActionResult> GetAllExercises([FromQuery] PaginationDto paginationData)
         {
             _logger.LogInformation("Getting all exercises");
 
-            var result = await _mediator.Send(new GetAllExercises());
-            var mappedResult = _mapper.Map<List<ExerciseGetDto>>(result);
+            var paginationFilter = _mapper.Map<PaginationFilter>(paginationData);
+
+            var exercises = await _mediator.Send(new GetAllExercises { PaginationFilter = paginationFilter});
+            var mappedExercises = _mapper.Map<List<ExerciseGetDto>>(exercises);
+
+            var paginationResponse = new PagedResponse<ExerciseGetDto>(mappedExercises);
+            paginationResponse.PageSize = paginationFilter.PageSize;
+            paginationResponse.PageNumber = paginationFilter.PageNumber;
 
             _logger.LogInformation("Successfully retrieved the exercises");
 
-            return Ok(mappedResult);
+            return Ok(paginationResponse);
 
+        }
+
+        [HttpGet]
+        [Route("search")]
+        public async Task<IActionResult> GetExercisesByName(string name,[FromQuery] PaginationDto paginationData)
+        {
+            _logger.LogInformation("Getting all exercises by name");
+
+            var paginationFilter = _mapper.Map<PaginationFilter>(paginationData);
+
+            var exercises = await _mediator.Send(new GetExercisesByName { Name = name, PaginationFilter = paginationFilter });
+
+            if (exercises == null)
+            {
+                _logger.LogError("Couldn't find any exercise with the selected name {0}", name);
+                return NotFound();
+            }
+
+            var mappedExercises = _mapper.Map<List<ExerciseGetDto>>(exercises);
+            var paginationResponse = new PagedResponse<ExerciseGetDto>(mappedExercises);
+            paginationResponse.PageSize = paginationFilter.PageSize;
+            paginationResponse.PageNumber = paginationFilter.PageNumber;
+
+            _logger.LogInformation("Successfully retrieved the exercises");
+
+            return Ok(paginationResponse);
         }
 
         [HttpGet]
@@ -46,8 +80,8 @@ namespace WorkoutTracker.Presentation.Controllers
         {
             _logger.LogInformation("Gettting exercise by id");
 
-            var result = await _mediator.Send(new GetExerciseById { Id = exerciseId });
-            if (result == null)
+            var exercise = await _mediator.Send(new GetExerciseById { Id = exerciseId });
+            if (exercise == null)
             {
                 _logger.LogError("Coulnd't find the exercise with the id, {0}", exerciseId);
 
@@ -56,18 +90,20 @@ namespace WorkoutTracker.Presentation.Controllers
 
             _logger.LogInformation("Successfully retrieved the exercise");
 
-            var mappedResult = _mapper.Map<ExerciseGetDto>(result);
-            return Ok(mappedResult);
+            var mappedExercise = _mapper.Map<ExerciseGetDto>(exercise);
+            return Ok(mappedExercise);
         }
 
         [HttpGet]
         [Route("category")]
-        public async Task<IActionResult> GetExercisesByCategory([FromQuery]string category)
+        public async Task<IActionResult> GetExercisesByCategory(string category, [FromQuery] PaginationDto paginationData)
         {
             _logger.LogInformation("Getting all exercises by category");
 
-            var result = await _mediator.Send(new GetExercisesByCategory { Category = category });
-            if (result == null)
+            var paginationFilter = _mapper.Map<PaginationFilter>(paginationData);
+
+            var exercises = await _mediator.Send(new GetExercisesByCategory { Category = category, PaginationFilter = paginationFilter });
+            if (exercises == null)
             {
                 _logger.LogError("Couldn't find any exercise with the selected category {0}", category);
                 return NotFound();
@@ -75,9 +111,50 @@ namespace WorkoutTracker.Presentation.Controllers
 
             _logger.LogInformation("Successfully retrieved the exercises");
 
-            var mappedResult = _mapper.Map<List<ExerciseGetDto>>(result);
-            return Ok(mappedResult);
+            var mappedExercises = _mapper.Map<List<ExerciseGetDto>>(exercises);
+            var paginationResponse = new PagedResponse<ExerciseGetDto>(mappedExercises);
+            paginationResponse.PageSize = paginationFilter.PageSize;
+            paginationResponse.PageNumber = paginationFilter.PageNumber;
+
+            return Ok(paginationResponse);
         }
+
+        [HttpGet]
+        [Route("categories")]
+        public async Task<IActionResult> GetExerciseCategories()
+        {
+            _logger.LogInformation("Getting all exercise categories");
+
+            var categories = await _mediator.Send(new GetExerciseCategories());
+            if (categories == null)
+            {
+                _logger.LogError("Couldn't find any category");
+                return NotFound();
+            }
+
+            _logger.LogInformation("Successfully retrieved the categories");
+
+            return Ok(categories);
+        }
+
+        [HttpGet]
+        [Route("names")]
+        public async Task<IActionResult> GetExercisesNames()
+        {
+            _logger.LogInformation("Getting all exercises names");
+
+            var names = await _mediator.Send(new GetExercisesNames());
+            if (names == null)
+            {
+                _logger.LogError("Couldn't find any exercise name");
+                return NotFound();
+            }
+
+            _logger.LogInformation("Successfully retrieved the exercises names");
+
+            return Ok(names);
+        }
+
 
         [HttpPost]
         public async Task<IActionResult> CreateExercise([FromBody] ExercisePutPostDto exercise)
@@ -96,7 +173,24 @@ namespace WorkoutTracker.Presentation.Controllers
             var mappedResult = _mapper.Map<ExerciseGetDto>(exerciseToAdd);
 
 
-            return CreatedAtAction(nameof(GetExerciseById), new { Id = mappedResult.Id }, mappedResult);
+            return CreatedAtAction(nameof(GetExerciseById), new { exerciseId = mappedResult.Id }, mappedResult);
+        }
+
+        [HttpPost]
+        [Route("add-exercises")]
+        public async Task<IActionResult> CreateExercises([FromBody] List<ExercisePutPostDto> exercises)
+        {
+            _logger.LogInformation("Creating a new exercises");
+            var mappedExercises = _mapper.Map<List<Exercise>>(exercises);
+
+            var exercisesToAdd = await _mediator.Send(new CreateExercises
+            {
+                Exercises = mappedExercises
+            });
+
+            _logger.LogInformation("Successfully created the exercises");
+
+            return Ok(exercisesToAdd);
         }
 
         [HttpDelete]

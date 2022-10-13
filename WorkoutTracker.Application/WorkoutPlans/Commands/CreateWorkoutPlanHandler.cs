@@ -26,6 +26,12 @@ namespace WorkoutTracker.Application.WorkoutPlans.Commands
                 TimesPerWeek = request.TimesPerWeek,
                 Routines = request.Routines
             });
+            var user = await _unitOfWork.UsersRepository.GetUserById(request.UserId);
+            if(user != null)
+            {
+
+            user.WorkoutPlans.Add(savedWorkoutPlan);
+            }
             await _unitOfWork.Save();
 
             return savedWorkoutPlan;

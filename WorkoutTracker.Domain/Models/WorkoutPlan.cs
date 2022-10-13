@@ -6,14 +6,14 @@ using System.Threading.Tasks;
 
 namespace WorkoutTracker.Domain.Models
 {
-    public class WorkoutPlan
+    public class WorkoutPlan 
     {
         public int Id { get; set; }
         public int UserId { get; set; }
         public string Name { get; set; }
         public int TimesPerWeek { get; set; }
         public ICollection<Routine> Routines { get; set; }
-        public User User { get; set; }
+        public ICollection<User> Users { get; set; }
 
     }
 }

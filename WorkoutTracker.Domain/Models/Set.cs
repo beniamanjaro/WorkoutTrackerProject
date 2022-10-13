@@ -16,10 +16,6 @@ namespace WorkoutTracker.Domain.Models
         public int WorkoutSetId { get; set; }
         public WorkoutSet WorkoutSet { get; set; }
 
-        public override string ToString()
-        {
-            return $" | {NumberOfReps | Weight}";
-        }
 
     }
 }

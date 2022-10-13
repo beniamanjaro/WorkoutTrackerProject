@@ -14,7 +14,7 @@ namespace WorkoutTracker.Domain.Abstractions
         Task<List<User>> GetAllUsers();
         Task<User> GetUserByIdentityId(string id);
         Task UpdateUser(User user);
-        void DeleteUser(User user);
+        Task DeleteUser(User user);
 
     }
 }

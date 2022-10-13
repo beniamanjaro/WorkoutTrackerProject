@@ -162,7 +162,8 @@ namespace WorkoutTracker.Infrastructure.Migrations
                         name: "FK_WorkoutSets_Routines_RoutineId",
                         column: x => x.RoutineId,
                         principalTable: "Routines",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(

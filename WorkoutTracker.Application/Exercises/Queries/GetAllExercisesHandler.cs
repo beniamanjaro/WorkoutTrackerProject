@@ -18,8 +18,8 @@ namespace WorkoutTracker.Application.Exercises.Queries
 
         public async Task<IEnumerable<Exercise>> Handle(GetAllExercises request, CancellationToken cancellationToken)
         {
-            var result = await _unitOfWork.ExercisesRepository.GetAllExercises();
-            return result;
+            var exercises = await _unitOfWork.ExercisesRepository.GetAllExercises(request.PaginationFilter);
+            return exercises;
         }
     }
 }

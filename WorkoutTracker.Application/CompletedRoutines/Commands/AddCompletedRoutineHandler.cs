@@ -21,9 +21,15 @@ namespace WorkoutTracker.Application.CompletedRoutines.Commands
         {
             var completedRoutineToAdd = await _unitOfWork.CompletedRoutinesRepository.AddCompletedRoutine(new CompletedRoutine
             {
-                Name = request.Name,
+                RoutineName = request.RoutineName,
+                WorkoutPlanName = request.WorkoutPlanName,
+                WorkoutPlanId = request.WorkoutPlanId,
+                CreatedAt = request.CreatedAt,
                 UserId = request.UserId,
-                RoutineId = request.RoutineId,
+                TotalVolume = request.TotalVolume,
+                TotalReps = request.TotalReps,
+                TotalSets = request.TotalSets,
+                Exercises = request.Exercises
             });
 
             await _unitOfWork.Save();

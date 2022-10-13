@@ -7,16 +7,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Google.Apis.Auth" Version="1.57.0" />
     <PackageReference Include="MediatR" Version="10.0.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Cors" Version="2.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.2.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\WorkoutTracker.Domain\WorkoutTracker.Domain.csproj" />
     <ProjectReference Include="..\WorkoutTracker.Infrastructure\WorkoutTracker.Infrastructure.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="WorkoutSets\Commands\" />
   </ItemGroup>
 
 </Project>

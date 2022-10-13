@@ -30,7 +30,9 @@ namespace WorkoutTracker.Application.WorkoutPlans.Commands
             await _unitOfWork.WorkoutPlansRepository.UpdateWorkoutPlan(workoutPlanToUpdate);
             await _unitOfWork.Save();
 
-            return workoutPlanToUpdate;
+            var updatedWorkoutPlan = await _unitOfWork.WorkoutPlansRepository.GetWorkoutPlanById(request.Id);
+
+            return updatedWorkoutPlan;
 
         }
     }

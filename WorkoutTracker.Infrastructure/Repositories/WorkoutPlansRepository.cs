@@ -29,6 +29,7 @@ namespace WorkoutTracker.Infrastructure.Repositories
             var workoutPlans = await _workoutContext.WorkoutPlans.Include(w => w.Routines)
                 .ThenInclude(r => r.WorkoutSets)
                 .ThenInclude(ws => ws.Sets).ThenInclude(s => s.Exercise)
+                .Include(w => w.Users)
                 .ToListAsync();
 
             return workoutPlans;
@@ -36,9 +37,12 @@ namespace WorkoutTracker.Infrastructure.Repositories
 
         public async Task<WorkoutPlan> GetWorkoutPlanById(int id)
         {
-            var workoutPlan = await _workoutContext.WorkoutPlans.Include(w => w.Routines)
+            var workoutPlan = await _workoutContext.WorkoutPlans
+                .Include(w => w.Routines)
                 .ThenInclude(r => r.WorkoutSets)
-                .ThenInclude(ws => ws.Sets).ThenInclude(s => s.Exercise)
+                .ThenInclude(ws => ws.Sets)
+                .ThenInclude(s => s.Exercise)
+                .Include(w => w.Users)
                 .SingleOrDefaultAsync(w => w.Id == id);
 
             return workoutPlan;
@@ -54,6 +58,36 @@ namespace WorkoutTracker.Infrastructure.Repositories
             return workoutPlans;
 
         }
+
+        public async Task<List<WorkoutPlan>> GetWorkoutPlansSubscriptionsByUser(int userId)
+        {
+            var workoutPlans = await _workoutContext.WorkoutPlans.Where(w => w.Users.Count() > 1 && w.Users.Any(u => u.Id == userId))
+                .Include(w => w.Users)
+                .Include(w => w.Routines).ThenInclude(r => r.WorkoutSets)
+                .ThenInclude(ws => ws.Sets).ThenInclude(s => s.Exercise)
+                .ToListAsync();
+
+            return workoutPlans;
+
+        }
+
+        public async Task<List<WorkoutPlan>> GetPopularWorkoutPlans(PaginationFilter paginationFilter)
+        {
+            var skip = (paginationFilter.PageNumber - 1) * paginationFilter.PageSize;
+
+            var workoutPlans = await _workoutContext.WorkoutPlans
+                .Include(w => w.Users)
+                .ToListAsync();
+               
+            var mostUsedWorkoutPlans = workoutPlans
+                .OrderByDescending(wp => wp.Users.Count()).Skip(skip)
+                .Take(paginationFilter.PageSize)
+                .ToList();
+
+            return mostUsedWorkoutPlans;
+
+        }
+
         public async void DeleteWorkoutPlan(WorkoutPlan workoutPlan)
         {
             _workoutContext.WorkoutPlans.Remove(workoutPlan);

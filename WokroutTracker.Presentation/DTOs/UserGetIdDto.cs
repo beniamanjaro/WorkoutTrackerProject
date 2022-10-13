@@ -1,8 +1,7 @@
 ﻿namespace WorkoutTracker.Presentation.DTOs
 {
-    public class PrimaryMuscleGetDto
+    public class UserGetIdDto
     {
         public int Id { get; set; }
-        public string Name { get; set; }
     }
 }

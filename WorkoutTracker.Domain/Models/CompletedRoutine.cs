@@ -10,11 +10,15 @@ namespace WorkoutTracker.Domain.Models
     public class CompletedRoutine
     {
         public int CompletedRoutineId { get; set; }
-        public string Name { get; set; }
-        public DateTime CreatedAt { get; set; } = DateTime.Now.Date;
+        public DateTime CreatedAt { get; set; } 
         public int UserId { get; set; }
         public User User { get; set; }
-        public Routine Routine { get; set; } 
-        public int RoutineId { get; set; }
+        public ICollection<CompletedRoutineExercise> Exercises { get; set; }
+        public string WorkoutPlanName { get; set; }
+        public int WorkoutPlanId { get; set; }
+        public string RoutineName { get; set; }
+        public int TotalVolume { get; set; }
+        public int TotalReps{ get; set; }
+        public int TotalSets { get; set; }
     }
 }

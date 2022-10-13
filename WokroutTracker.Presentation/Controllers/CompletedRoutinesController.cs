@@ -47,16 +47,62 @@ namespace WorkoutTracker.Presentation.Controllers
             return Ok(mappedResult);
         }
 
+        [HttpGet]
+        [Route("user")]
+        public async Task<IActionResult> GetCompletedRoutinesByUserId(int userId)
+        {
+            _logger.LogInformation("Getting completed routines by user id.");
+
+            var result = await _mediator.Send(new GetCompletedRoutinesByUser() { UserId = userId });
+            if (result == null)
+            {
+                _logger.LogWarning("Couldn't find the completed routines for user id {0}", userId);
+                return NotFound();
+            }
+
+            _logger.LogInformation("Successfully retrieved completed routines");
+
+            var mappedResult = _mapper.Map<List<CompletedRoutineGetDto>>(result);
+            return Ok(mappedResult);
+        }
+
+        [HttpGet]
+        [Route("users/{userId}/workout-plans/{workoutPlanId}")]
+        public async Task<IActionResult> GetCompletedRoutinesByUserByWorkoutPlan(int userId, int workoutPlanId)
+        {
+            _logger.LogInformation("Getting completed routines by user {0} for workout plan {1}.", userId, workoutPlanId);
+
+            var result = await _mediator.Send(new GetCompletedRoutinesByUserByWorkoutPlan { UserId = userId, WorkoutPlanId = workoutPlanId });
+            if (result == null)
+            {
+                _logger.LogWarning("Couldn't find the completed routines for user {0} for workout plan {1}", userId, workoutPlanId);
+                return NotFound();
+            }
+
+            _logger.LogInformation("Successfully retrieved completed routines");
+
+            var mappedResult = _mapper.Map<List<CompletedRoutineGetDto>>(result);
+            return Ok(mappedResult);
+        }
+
         [HttpPost]
-        public async Task<IActionResult> AddCompletedRoutine(int userId, [FromBody] CompletedRoutinePutPostDto completedRoutine)
+        public async Task<IActionResult> AddCompletedRoutine([FromBody] CompletedRoutinePutPostDto completedRoutine)
         {
             _logger.LogInformation("Adding a completed routine to database.");
 
+            var mappedCompletedRoutine = _mapper.Map<CompletedRoutine>(completedRoutine);
+
             var result = await _mediator.Send(new AddCompletedRoutine
             {
-                Name = completedRoutine.Name,
-                UserId = userId,
-                RoutineId = completedRoutine.RoutineId,
+                RoutineName = mappedCompletedRoutine.RoutineName,
+                WorkoutPlanName = mappedCompletedRoutine.WorkoutPlanName,
+                WorkoutPlanId = mappedCompletedRoutine.WorkoutPlanId,
+                UserId = mappedCompletedRoutine.UserId,
+                CreatedAt = mappedCompletedRoutine.CreatedAt,
+                Exercises = mappedCompletedRoutine.Exercises,
+                TotalReps = mappedCompletedRoutine.TotalReps,
+                TotalSets = mappedCompletedRoutine.TotalSets,
+                TotalVolume = mappedCompletedRoutine.TotalVolume,
             });
 
             _logger.LogInformation("Successfully added the completed routine");
@@ -64,6 +110,7 @@ namespace WorkoutTracker.Presentation.Controllers
             var mappedResult = _mapper.Map<CompletedRoutineGetDto>(result);
             return CreatedAtAction(nameof(GetCompletedRoutineById), new { Id = mappedResult.CompletedRoutineId }, mappedResult);
         }
+
 
         [HttpDelete]
         [Route("{id}")]

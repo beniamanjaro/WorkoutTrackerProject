@@ -2,13 +2,16 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using WorkoutTracker.Application.Exercises.Queries;
 using WorkoutTracker.Application.Routines.Commands;
 using WorkoutTracker.Application.Sets.Commands;
+using WorkoutTracker.Application.Stats.Queries;
 using WorkoutTracker.Application.WorkoutPlans.Commands;
 using WorkoutTracker.Application.WorkoutPlans.Queries;
 using WorkoutTracker.Application.WorkoutSets.Commands;
 using WorkoutTracker.Domain.Models;
 using WorkoutTracker.Presentation.DTOs;
+using WorkoutTracker.Presentation.Responses;
 
 namespace WokroutTracker.Presentation.Controllers
 {
@@ -44,6 +47,20 @@ namespace WokroutTracker.Presentation.Controllers
         }
 
         [HttpGet]
+        [Route("{id}/top-users")]
+        public async Task<IActionResult> GetTopUsersForWorkoutPlan(int id)
+        {
+            _logger.LogInformation("Getting top users for the workout plan");
+
+            var result = await _mediator.Send(new GetTopUsersForWorkoutPlan() { Id = id});
+
+            _logger.LogInformation("Successfully retrieved the users");
+
+            return Ok(result);
+
+        }
+
+        [HttpGet]
         [Route("{id}")]
         public async Task<IActionResult> GetWorkoutPlanById(int id)
         {
@@ -62,6 +79,44 @@ namespace WokroutTracker.Presentation.Controllers
             return Ok(mappedResult);
         }
 
+        [HttpGet]
+        [Route("{id}/muscle-split")]
+        public async Task<IActionResult> GetMusclesplitForWorkoutPlan(int id)
+        {
+            _logger.LogInformation("Getting the workout plan with the id {0}", id);
+
+            var result = await _mediator.Send(new GetMuscleSplitForRoutinesByWorkoutPlan { Id = id });
+            if (result == null)
+            {
+                _logger.LogError("Couldn't find the workout plan with the id {0}", id);
+                return NotFound();
+            }
+
+            _logger.LogInformation("Successfully retrieved the workout plan");
+
+            return Ok(result);
+        }
+
+        [HttpGet]
+        [Route("most-popular-workout-plans")]
+        public async Task<IActionResult> GetMostUsedWorkoutPlans([FromQuery] PaginationDto paginationData)
+        {
+
+            _logger.LogInformation("Getting most popular workout plans");
+
+            var paginationFilter = _mapper.Map<PaginationFilter>(paginationData);
+
+            var workoutPlans = await _mediator.Send(new GetMostUsedWorkoutPlans { PaginationFilter = paginationFilter });
+            var mappedWorkoutPlans = _mapper.Map<List<WorkoutPlanGetDto>>(workoutPlans);
+
+            var paginationResponse = new PagedResponse<WorkoutPlanGetDto>(mappedWorkoutPlans);
+            paginationResponse.PageSize = paginationFilter.PageSize;
+            paginationResponse.PageNumber = paginationFilter.PageNumber;
+
+            _logger.LogInformation("Successfully retrieved the workout plans");
+
+            return Ok(paginationResponse);
+        }
 
         [HttpPost]
         public async Task<IActionResult> CreateWorkoutPlan([FromBody] WorkoutPlanPostDto workoutPlan)
@@ -104,16 +159,18 @@ namespace WokroutTracker.Presentation.Controllers
 
         [HttpPut]
         [Route("{id}")]
-        public async Task<IActionResult> UpdateWorkoutPlan(int id,[FromBody] WorkoutPlanPutDto workoutPlan)
+        public async Task<IActionResult> UpdateWorkoutPlan(int id,[FromBody] WorkoutPlanPostDto workoutPlan)
         {
             _logger.LogInformation("Updating workout plan with the id {0}", id);
 
+            var mappedWorkoutPlan = _mapper.Map<WorkoutPlan>(workoutPlan);
+
             var result = await _mediator.Send(new UpdateWorkoutPlan {
-                Name = workoutPlan.Name,
+                Name = mappedWorkoutPlan.Name,
                 Id = id,
-                TimesPerWeek = workoutPlan.TimesPerWeek,
-                Routines = workoutPlan.Routines,
-                UserId = workoutPlan.UserId
+                TimesPerWeek = mappedWorkoutPlan.TimesPerWeek,
+                Routines = mappedWorkoutPlan.Routines,
+                UserId = mappedWorkoutPlan.UserId
             });
 
             _logger.LogInformation("Successfully updated the workout plan");

@@ -8,7 +8,7 @@ namespace WorkoutTracker.Presentation.DTOs
         public string Name { get; set; }
         public string Category { get; set; }
         public string Equipment { get; set; }
-        public ICollection<PrimaryMuscleGetDto> PrimaryMuscles {get; set;}
-        public ICollection<SecondaryMuscleGetDto> SecondaryMuscles {get; set;}
+        public string GifLink { get; set; }
+        public string Muscle { get; set; }
     }
 }

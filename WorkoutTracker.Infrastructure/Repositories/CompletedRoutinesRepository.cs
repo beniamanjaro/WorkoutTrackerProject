@@ -20,18 +20,18 @@ namespace WorkoutTracker.Infrastructure.Repositories
         public async Task<CompletedRoutine> GetCompletedRoutineById(int id)
         {
             var completedRoutine = await _workoutContext.CompletedRoutines
-                .Include(cr => cr.Routine)
-                .ThenInclude(cr => cr.WorkoutSets).ThenInclude(ws => ws.Sets)
-                .ThenInclude(s => s.Exercise).SingleOrDefaultAsync(cr => cr.CompletedRoutineId == id);
+                .Include(cr => cr.Exercises).ThenInclude(e => e.Exercise)
+                .SingleOrDefaultAsync(cr => cr.CompletedRoutineId == id);
             return completedRoutine;
         }
 
         public async Task<List<CompletedRoutine>> GetCompletedRoutinesByUser(int userId)
         {
-            var completedRoutines = await _workoutContext.CompletedRoutines.Where(cr => cr.UserId == userId)
-                .Include(cr => cr.Routine)
-                .ThenInclude(cr => cr.WorkoutSets).ThenInclude(ws => ws.Sets)
-                .ThenInclude(s => s.Exercise).ToListAsync();
+            var completedRoutines = await _workoutContext.CompletedRoutines
+                .Where(cr => cr.UserId == userId)
+                .Include(cr => cr.Exercises)
+                .ThenInclude(e => e.Exercise)
+                .ToListAsync();
             return completedRoutines;
         }
         public async Task<CompletedRoutine> AddCompletedRoutine(CompletedRoutine completedRoutine)

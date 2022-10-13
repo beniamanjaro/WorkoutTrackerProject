@@ -10,6 +10,8 @@ namespace WorkoutTracker.Presentation.Profiles
         {
             CreateMap<CompletedRoutine, CompletedRoutineGetDto>();
             CreateMap<CompletedRoutinePutPostDto, CompletedRoutine>();
+            CreateMap<CompletedRoutineExercise, CompletedRoutineExerciseGetDto>();
+            CreateMap<CompletedRoutineExercisePostDto, CompletedRoutineExercise>();
         }
     }
 }

@@ -84,7 +84,7 @@ namespace WorkoutTracker.Presentation.Controllers
                 return Ok(result);
             }
 
-            _logger.LogError("User couldn't log in.");
+            _logger.LogError("User couldn't log in with google.");
             _logger.LogError(result.Message);
 
             return BadRequest(result);

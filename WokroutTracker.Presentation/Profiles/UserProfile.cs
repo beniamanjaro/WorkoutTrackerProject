@@ -9,6 +9,7 @@ namespace WorkoutTracker.Presentation.Profiles
         public UserProfile()
         {
             CreateMap<User, UserGetDto>();
+            CreateMap<User, UserGetIdDto>();
             CreateMap<UserPutPostDto, User>();
         }
     }

@@ -38,6 +38,14 @@ namespace WorkoutTracker.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("GifLink")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Muscle")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -245,6 +253,21 @@ namespace WorkoutTracker.Infrastructure.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("UserWorkoutPlan", b =>
+                {
+                    b.Property<int>("UsersId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("WorkoutPlansId")
+                        .HasColumnType("int");
+
+                    b.HasKey("UsersId", "WorkoutPlansId");
+
+                    b.HasIndex("WorkoutPlansId");
+
+                    b.ToTable("UserWorkoutPlan");
+                });
+
             modelBuilder.Entity("WorkoutTracker.Domain.Models.CompletedRoutine", b =>
                 {
                     b.Property<int>("CompletedRoutineId")
@@ -256,26 +279,37 @@ namespace WorkoutTracker.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Name")
+                    b.Property<string>("RoutineName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("RoutineId")
+                    b.Property<int>("TotalReps")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TotalSets")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TotalVolume")
                         .HasColumnType("int");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
-                    b.HasKey("CompletedRoutineId");
+                    b.Property<int>("WorkoutPlanId")
+                        .HasColumnType("int");
 
-                    b.HasIndex("RoutineId");
+                    b.Property<string>("WorkoutPlanName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("CompletedRoutineId");
 
                     b.HasIndex("UserId");
 
                     b.ToTable("CompletedRoutines");
                 });
 
-            modelBuilder.Entity("WorkoutTracker.Domain.Models.PrimaryMuscle", b =>
+            modelBuilder.Entity("WorkoutTracker.Domain.Models.CompletedRoutineExercise", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -283,18 +317,25 @@ namespace WorkoutTracker.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<int?>("ExerciseId")
+                    b.Property<int>("CompletedRoutineId")
                         .HasColumnType("int");
 
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("ExerciseId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Reps")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Weight")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CompletedRoutineId");
+
                     b.HasIndex("ExerciseId");
 
-                    b.ToTable("PrimaryMuscles");
+                    b.ToTable("CompletedRoutineExercise");
                 });
 
             modelBuilder.Entity("WorkoutTracker.Domain.Models.Routine", b =>
@@ -320,28 +361,6 @@ namespace WorkoutTracker.Infrastructure.Migrations
                     b.HasIndex("WorkoutPlanId");
 
                     b.ToTable("Routines");
-                });
-
-            modelBuilder.Entity("WorkoutTracker.Domain.Models.SecondaryMuscle", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<int?>("ExerciseId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ExerciseId");
-
-                    b.ToTable("SecondaryMuscle");
                 });
 
             modelBuilder.Entity("WorkoutTracker.Domain.Models.Set", b =>
@@ -423,8 +442,6 @@ namespace WorkoutTracker.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId");
-
                     b.ToTable("WorkoutPlans");
                 });
 
@@ -497,30 +514,47 @@ namespace WorkoutTracker.Infrastructure.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("WorkoutTracker.Domain.Models.CompletedRoutine", b =>
+            modelBuilder.Entity("UserWorkoutPlan", b =>
                 {
-                    b.HasOne("WorkoutTracker.Domain.Models.Routine", "Routine")
+                    b.HasOne("WorkoutTracker.Domain.Models.User", null)
                         .WithMany()
-                        .HasForeignKey("RoutineId")
+                        .HasForeignKey("UsersId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("WorkoutTracker.Domain.Models.WorkoutPlan", null)
+                        .WithMany()
+                        .HasForeignKey("WorkoutPlansId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("WorkoutTracker.Domain.Models.CompletedRoutine", b =>
+                {
                     b.HasOne("WorkoutTracker.Domain.Models.User", "User")
                         .WithMany("CompletedRoutines")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Routine");
 
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("WorkoutTracker.Domain.Models.PrimaryMuscle", b =>
+            modelBuilder.Entity("WorkoutTracker.Domain.Models.CompletedRoutineExercise", b =>
                 {
+                    b.HasOne("WorkoutTracker.Domain.Models.CompletedRoutine", "CompletedRoutine")
+                        .WithMany("Exercises")
+                        .HasForeignKey("CompletedRoutineId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Exercise", "Exercise")
-                        .WithMany("PrimaryMuscles")
-                        .HasForeignKey("ExerciseId");
+                        .WithMany()
+                        .HasForeignKey("ExerciseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CompletedRoutine");
 
                     b.Navigation("Exercise");
                 });
@@ -534,15 +568,6 @@ namespace WorkoutTracker.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("WorkoutPlan");
-                });
-
-            modelBuilder.Entity("WorkoutTracker.Domain.Models.SecondaryMuscle", b =>
-                {
-                    b.HasOne("Exercise", "Exercise")
-                        .WithMany("SecondaryMuscles")
-                        .HasForeignKey("ExerciseId");
-
-                    b.Navigation("Exercise");
                 });
 
             modelBuilder.Entity("WorkoutTracker.Domain.Models.Set", b =>
@@ -575,17 +600,6 @@ namespace WorkoutTracker.Infrastructure.Migrations
                     b.Navigation("Identity");
                 });
 
-            modelBuilder.Entity("WorkoutTracker.Domain.Models.WorkoutPlan", b =>
-                {
-                    b.HasOne("WorkoutTracker.Domain.Models.User", "User")
-                        .WithMany("WorkoutPlans")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("WorkoutTracker.Domain.Models.WorkoutSet", b =>
                 {
                     b.HasOne("WorkoutTracker.Domain.Models.Routine", "Routine")
@@ -595,11 +609,9 @@ namespace WorkoutTracker.Infrastructure.Migrations
                     b.Navigation("Routine");
                 });
 
-            modelBuilder.Entity("Exercise", b =>
+            modelBuilder.Entity("WorkoutTracker.Domain.Models.CompletedRoutine", b =>
                 {
-                    b.Navigation("PrimaryMuscles");
-
-                    b.Navigation("SecondaryMuscles");
+                    b.Navigation("Exercises");
                 });
 
             modelBuilder.Entity("WorkoutTracker.Domain.Models.Routine", b =>
@@ -610,8 +622,6 @@ namespace WorkoutTracker.Infrastructure.Migrations
             modelBuilder.Entity("WorkoutTracker.Domain.Models.User", b =>
                 {
                     b.Navigation("CompletedRoutines");
-
-                    b.Navigation("WorkoutPlans");
                 });
 
             modelBuilder.Entity("WorkoutTracker.Domain.Models.WorkoutPlan", b =>

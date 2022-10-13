@@ -27,12 +27,16 @@ namespace WorkoutTracker.Infrastructure.Repositories
         public async Task<List<User>> GetAllUsers()
         {
             return await _workoutContext.Users.Include(u => u.WorkoutPlans)
+                .Include(u => u.CompletedRoutines)
                 .ToListAsync();
         }
 
         public async Task<User> GetUserById(int id)
         {
             return await _workoutContext.Users.Include(u => u.WorkoutPlans)
+                .ThenInclude(wp => wp.Routines)
+                .ThenInclude(r => r.WorkoutSets)
+                .ThenInclude(ws => ws.Sets)
                 .FirstOrDefaultAsync(u => u.Id == id);
         }
 
@@ -46,7 +50,7 @@ namespace WorkoutTracker.Infrastructure.Repositories
         {
             _workoutContext.Users.Update(user);
         }
-        public void DeleteUser(User user)
+        public async Task DeleteUser(User user)
         {
             _workoutContext.Users.Remove(user);
         }
