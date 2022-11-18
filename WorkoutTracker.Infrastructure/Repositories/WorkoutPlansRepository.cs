@@ -35,6 +35,18 @@ namespace WorkoutTracker.Infrastructure.Repositories
             return workoutPlans;
         }
 
+        public async Task<List<WorkoutPlan>> GetAllWorkoutPlansBySearchValue(string searchValue)
+        {
+            var workoutPlans = await _workoutContext.WorkoutPlans
+                .Include(w => w.Users)
+                .Where(wp => wp.Name.Contains(searchValue))
+                .ToListAsync();
+
+            return workoutPlans;
+        }
+
+
+
         public async Task<WorkoutPlan> GetWorkoutPlanById(int id)
         {
             var workoutPlan = await _workoutContext.WorkoutPlans

@@ -40,13 +40,35 @@ namespace WorkoutTracker.Infrastructure.Repositories
             return completedRoutineToAdd.Entity;
         }
 
-        public async Task<List<CompletedRoutine>> GetCompletedRoutinesByUserByTimeframe(int userId, int timeframeInMonths)
+        public async Task<PagedList<CompletedRoutine>> GetCompletedRoutinesByUserByTimeframe(int userId, int timeframeInMonths, PaginationFilter paginationFilter)
         {
-            var completedRoutines = await _workoutContext.CompletedRoutines
+            var completedRoutines = _workoutContext.CompletedRoutines
                 .Where(cr => cr.UserId == userId)
                 .Where(cr => cr.CreatedAt > DateTime.Now.AddMonths(timeframeInMonths * -1))
-                .OrderByDescending(cr => cr.CreatedAt)
-                .ToListAsync();
+                .OrderByDescending(cr => cr.CreatedAt);
+
+            return PagedList<CompletedRoutine>.ToPagedList(completedRoutines, paginationFilter.PageNumber, paginationFilter.PageSize);
+        }
+
+        public async Task<PagedList<CompletedRoutine>> GetCompletedRoutinesByWorkoutPlanByUser(int userId, int workoutPlanId, PaginationFilter paginationFilter)
+        {
+            var completedRoutines = await GetCompletedRoutinesByUser(userId);
+            var result = completedRoutines.Where(cr => cr.WorkoutPlanId == workoutPlanId).OrderByDescending(cr => cr.CreatedAt).AsQueryable();
+
+            return PagedList<CompletedRoutine>.ToPagedList(result, paginationFilter.PageNumber, paginationFilter.PageSize);
+        }
+
+        public async Task<CompletedRoutine> GetMostRecentCompletedRoutinesExercisesStatsByUserByWorkoutPlanByName(int userId, int workoutPlanId, string routineName)
+        {
+            var completedRoutines = await GetCompletedRoutinesByUser(userId);
+            var result = completedRoutines.Where(cr => cr.WorkoutPlanId == workoutPlanId && cr.RoutineName == routineName.ToLower()).OrderByDescending(cr => cr.CreatedAt).FirstOrDefault();
+
+            return result;
+        }
+
+        public async Task<List<CompletedRoutine>> GetCompletedRoutinesByWorkoutPlan(int workoutPlanId)
+        {
+            var completedRoutines = await _workoutContext.CompletedRoutines.Where(cr => cr.WorkoutPlanId == workoutPlanId).ToListAsync();
 
             return completedRoutines;
         }

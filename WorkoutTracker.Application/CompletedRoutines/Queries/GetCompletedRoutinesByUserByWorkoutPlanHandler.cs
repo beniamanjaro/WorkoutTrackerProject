@@ -9,7 +9,7 @@ using WorkoutTracker.Domain.Models;
 
 namespace WorkoutTracker.Application.CompletedRoutines.Queries
 {
-    public class GetCompletedRoutinesByUserByWorkoutPlanHandler : IRequestHandler<GetCompletedRoutinesByUserByWorkoutPlan, List<CompletedRoutine>>
+    public class GetCompletedRoutinesByUserByWorkoutPlanHandler : IRequestHandler<GetCompletedRoutinesByUserByWorkoutPlan, PagedList<CompletedRoutine>>
     {
         private readonly IUnitOfWork _unitOfWork;
 
@@ -17,12 +17,11 @@ namespace WorkoutTracker.Application.CompletedRoutines.Queries
         {
             _unitOfWork = unitOfWork;
         }
-        public async Task<List<CompletedRoutine>> Handle(GetCompletedRoutinesByUserByWorkoutPlan request, CancellationToken cancellationToken)
+        public async Task<PagedList<CompletedRoutine>> Handle(GetCompletedRoutinesByUserByWorkoutPlan request, CancellationToken cancellationToken)
         {
-            var completedRoutines = await _unitOfWork.CompletedRoutinesRepository.GetCompletedRoutinesByUser(request.UserId);
-            var result = completedRoutines.Where(cr => cr.WorkoutPlanId == request.WorkoutPlanId).OrderByDescending(cr => cr.CreatedAt).ToList();
+            var completedRoutines = await _unitOfWork.CompletedRoutinesRepository.GetCompletedRoutinesByWorkoutPlanByUser(request.UserId, request.WorkoutPlanId, request.PaginationFilter);
 
-            return result;
+            return completedRoutines;
         }
     }
 }

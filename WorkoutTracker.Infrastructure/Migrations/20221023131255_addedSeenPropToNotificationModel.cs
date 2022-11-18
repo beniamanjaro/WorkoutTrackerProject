@@ -4,23 +4,23 @@
 
 namespace WorkoutTracker.Infrastructure.Migrations
 {
-    public partial class changedExerciseModel : Migration
+    public partial class addedSeenPropToNotificationModel : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<string>(
-                name: "GifLink",
-                table: "Exercises",
-                type: "nvarchar(max)",
+            migrationBuilder.AddColumn<bool>(
+                name: "Seen",
+                table: "Notification",
+                type: "bit",
                 nullable: false,
-                defaultValue: "");
+                defaultValue: false);
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "GifLink",
-                table: "Exercises");
+                name: "Seen",
+                table: "Notification");
         }
     }
 }

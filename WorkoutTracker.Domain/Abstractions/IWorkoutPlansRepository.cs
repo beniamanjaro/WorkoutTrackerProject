@@ -14,6 +14,7 @@ namespace WorkoutTracker.Domain.Abstractions
         Task<List<WorkoutPlan>> GetWorkoutPlansByUser(int userId);
         Task<List<WorkoutPlan>> GetWorkoutPlansSubscriptionsByUser(int userId);
         Task<List<WorkoutPlan>> GetPopularWorkoutPlans(PaginationFilter paginationFilter);
+        Task<List<WorkoutPlan>> GetAllWorkoutPlansBySearchValue(string searchValue);
         Task<List<WorkoutPlan>> GetAllWorkoutPlans();
         Task UpdateWorkoutPlan(WorkoutPlan workoutPlan);
         void DeleteWorkoutPlan(WorkoutPlan workoutPlan);

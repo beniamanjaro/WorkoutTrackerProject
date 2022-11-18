@@ -12,8 +12,8 @@ using WorkoutTracker.Infrastructure;
 namespace WorkoutTracker.Infrastructure.Migrations
 {
     [DbContext(typeof(WorkoutContext))]
-    [Migration("20221001052704_addedWorkoutPlanAndRoutineNameToCompletedRoutine")]
-    partial class addedWorkoutPlanAndRoutineNameToCompletedRoutine
+    [Migration("20221018125457_init")]
+    partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -281,10 +281,6 @@ namespace WorkoutTracker.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("RoutineName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -301,6 +297,9 @@ namespace WorkoutTracker.Infrastructure.Migrations
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("WorkoutPlanId")
+                        .HasColumnType("int");
+
                     b.Property<string>("WorkoutPlanName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -308,6 +307,8 @@ namespace WorkoutTracker.Infrastructure.Migrations
                     b.HasKey("CompletedRoutineId");
 
                     b.HasIndex("UserId");
+
+                    b.HasIndex("WorkoutPlanId");
 
                     b.ToTable("CompletedRoutines");
                 });
@@ -433,6 +434,9 @@ namespace WorkoutTracker.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -540,7 +544,13 @@ namespace WorkoutTracker.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("WorkoutTracker.Domain.Models.WorkoutPlan", "WorkoutPlan")
+                        .WithMany()
+                        .HasForeignKey("WorkoutPlanId");
+
                     b.Navigation("User");
+
+                    b.Navigation("WorkoutPlan");
                 });
 
             modelBuilder.Entity("WorkoutTracker.Domain.Models.CompletedRoutineExercise", b =>

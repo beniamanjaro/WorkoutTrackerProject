@@ -11,6 +11,7 @@ using WorkoutTracker.Domain.Abstractions;
 using WorkoutTracker.Infrastructure;
 using WorkoutTracker.Infrastructure.Repositories;
 using WorkoutTracker.Presentation;
+using WorkoutTracker.Presentation.Hubs;
 using WorkoutTracker.Presentation.Profiles;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -67,7 +68,7 @@ builder.Services.AddCors(options =>
             .AllowAnyHeader());
 });
 
-
+builder.Services.AddSignalR();
 builder.Services.AddMediatR(typeof(GetAllWorkoutPlans));
 builder.Services.AddAutoMapper(typeof(WorkoutPlanProfile));
 
@@ -90,6 +91,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapHub<NotificationHub>("/hubs/notifications");
 
 app.Run();
 

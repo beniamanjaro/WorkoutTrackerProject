@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace WorkoutTracker.Application.Stats.Queries
 {
-    public class GetExerciseStatsByUser : IRequest<int>
+    public class GetExerciseStatsByUser : IRequest<double>
     {
         public int UserId { get; set; }
         public string ExerciseName { get; set; }

@@ -92,11 +92,13 @@ namespace WorkoutTracker.Presentation.Controllers
 
         [HttpGet]
         [Route("{userId}/history")]
-        public async Task<IActionResult> GetCompletedRoutinesByTimeFrame(int userId, [FromQuery]int timeframeInMonths)
+        public async Task<IActionResult> GetCompletedRoutinesByTimeFrame(int userId, [FromQuery]int timeframeInMonths, [FromQuery] PaginationDto paginationData)
         {
             _logger.LogInformation("Getting the completed routines for the user with id {0} in the past {1} months", userId, timeframeInMonths);
 
-            var result = await _mediator.Send(new GetCompletedRoutinesByUserByTimeframe() {UserId = userId, TimeframeInMonths = timeframeInMonths });
+            var paginationFilter = _mapper.Map<PaginationFilter>(paginationData);
+
+            var result = await _mediator.Send(new GetCompletedRoutinesByUserByTimeframe() {UserId = userId, TimeframeInMonths = timeframeInMonths, PaginationFilter = paginationFilter });
             if (result == null)
             {
                 _logger.LogError("Couldn't find any completed routines in the selected timeframe");
@@ -106,7 +108,16 @@ namespace WorkoutTracker.Presentation.Controllers
             _logger.LogInformation("Successfully retrieved the completed routines");
 
             var mappedResult = _mapper.Map<List<CompletedRoutineGetDto>>(result);
-            return Ok(mappedResult);
+
+            var paginationResponse = new PagedResponse<CompletedRoutineGetDto>();
+            paginationResponse.Data = mappedResult;
+            paginationResponse.TotalPages = result.TotalPages;
+            paginationResponse.HasNext = result.HasNext;
+            paginationResponse.HasPrevious = result.HasPrevious;
+            paginationResponse.PageSize = paginationFilter.PageSize;
+            paginationResponse.PageNumber = paginationFilter.PageNumber;
+
+            return Ok(paginationResponse);
         }
 
         [HttpGet]
@@ -200,6 +211,26 @@ namespace WorkoutTracker.Presentation.Controllers
 
             _logger.LogInformation("Successfully retrieved the stats");
             
+
+
+            return Ok(stats);
+        }
+
+        [HttpGet]
+        [Route("{userId}/analytics/muscle-split")]
+        public async Task<IActionResult> GetMuscleSplitForAllTime(int userId)
+        {
+            _logger.LogInformation("Getting the stats for the user with the id {0}", userId);
+
+            var stats = await _mediator.Send(new GetMuscleSplitForAllTime { UserId = userId });
+            if (stats == null)
+            {
+                _logger.LogError("Couldn't get the stats for the user with the id {0}", userId);
+                return NotFound();
+            }
+
+            _logger.LogInformation("Successfully retrieved the stats");
+
 
 
             return Ok(stats);

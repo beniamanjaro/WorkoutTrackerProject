@@ -5,10 +5,12 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using WorkoutTracker.Application.CompletedRoutines.Commands;
 using WorkoutTracker.Application.CompletedRoutines.Queries;
+using WorkoutTracker.Application.Stats.Queries;
 using WorkoutTracker.Application.Users.Commands;
 using WorkoutTracker.Application.WorkoutPlans.Queries;
 using WorkoutTracker.Domain.Models;
 using WorkoutTracker.Presentation.DTOs;
+using WorkoutTracker.Presentation.Responses;
 
 namespace WorkoutTracker.Presentation.Controllers
 {
@@ -48,7 +50,25 @@ namespace WorkoutTracker.Presentation.Controllers
         }
 
         [HttpGet]
-        [Route("user")]
+        [Route("{id}/muscle-split")]
+        public async Task<IActionResult> GetMuscleSplitForCompletedRoutine(int id)
+        {
+            _logger.LogInformation("Getting completed routine by id.");
+
+            var result = await _mediator.Send(new GetMuscleSplitForExercises() { CompletedRoutineId = id });
+            if (result == null)
+            {
+                _logger.LogWarning("Couldn't find the completed routine by id {0}", id);
+                return NotFound();
+            }
+
+            _logger.LogInformation("Successfully retrieved completed routine");
+
+            return Ok(result);
+        }
+
+        [HttpGet]
+        [Route("users/{userId}")]
         public async Task<IActionResult> GetCompletedRoutinesByUserId(int userId)
         {
             _logger.LogInformation("Getting completed routines by user id.");
@@ -68,20 +88,48 @@ namespace WorkoutTracker.Presentation.Controllers
 
         [HttpGet]
         [Route("users/{userId}/workout-plans/{workoutPlanId}")]
-        public async Task<IActionResult> GetCompletedRoutinesByUserByWorkoutPlan(int userId, int workoutPlanId)
+        public async Task<IActionResult> GetCompletedRoutinesByUserByWorkoutPlan(int userId, int workoutPlanId, [FromQuery]PaginationDto paginationData)
         {
             _logger.LogInformation("Getting completed routines by user {0} for workout plan {1}.", userId, workoutPlanId);
+            var paginationFilter = _mapper.Map<PaginationFilter>(paginationData);
 
-            var result = await _mediator.Send(new GetCompletedRoutinesByUserByWorkoutPlan { UserId = userId, WorkoutPlanId = workoutPlanId });
+            var result = await _mediator.Send(new GetCompletedRoutinesByUserByWorkoutPlan { UserId = userId, WorkoutPlanId = workoutPlanId, PaginationFilter = paginationFilter });
             if (result == null)
             {
                 _logger.LogWarning("Couldn't find the completed routines for user {0} for workout plan {1}", userId, workoutPlanId);
                 return NotFound();
             }
+            var mappedResult = _mapper.Map<List<CompletedRoutineGetDto>>(result);
+
+            var paginationResponse = new PagedResponse<CompletedRoutineGetDto>();
+            paginationResponse.Data = mappedResult;
+            paginationResponse.TotalPages = result.TotalPages;
+            paginationResponse.HasNext = result.HasNext;
+            paginationResponse.HasPrevious = result.HasPrevious;
+            paginationResponse.PageSize = paginationFilter.PageSize;
+            paginationResponse.PageNumber = paginationFilter.PageNumber;
 
             _logger.LogInformation("Successfully retrieved completed routines");
 
-            var mappedResult = _mapper.Map<List<CompletedRoutineGetDto>>(result);
+            return Ok(paginationResponse);
+        }
+
+        [HttpGet]
+        [Route("users/{userId}/workout-plans/{workoutPlanId}/routines/{routineName}")]
+        public async Task<IActionResult> GetMostRecentCompletedRoutineExercisesStatsByUserByWorkoutPlanByName(int userId, int workoutPlanId, string routineName)
+        {
+            _logger.LogInformation("Getting completed routines by user {0} for workout plan {1}.", userId, workoutPlanId);
+
+            var result = await _mediator.Send(new GetCompletedRoutineExercisesStatsByUserByWorkoutPlanByName { UserId = userId, WorkoutPlanId = workoutPlanId, RoutineName = routineName });
+            if (result == null)
+            {
+                _logger.LogWarning("Couldn't find the completed routines for user {0} for workout plan {1}", userId, workoutPlanId);
+                return NotFound();
+            }
+            var mappedResult = _mapper.Map<List<CompletedRoutineExerciseGetDto>>(result);
+
+            _logger.LogInformation("Successfully retrieved completed routines");
+
             return Ok(mappedResult);
         }
 

@@ -5,7 +5,7 @@ namespace WorkoutTracker.Presentation.DTOs
     public class CompletedRoutinePutPostDto
     {
         public string WorkoutPlanName { get; set; }
-        public int WorkoutPlanId { get; set; }
+        public int? WorkoutPlanId { get; set; }
         public string RoutineName { get; set; }
         public int UserId { get; set; }
         public ICollection<CompletedRoutineExercisePostDto> Exercises { get; set; }

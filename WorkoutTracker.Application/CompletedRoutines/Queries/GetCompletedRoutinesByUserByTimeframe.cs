@@ -8,9 +8,10 @@ using WorkoutTracker.Domain.Models;
 
 namespace WorkoutTracker.Application.CompletedRoutines.Queries
 {
-    public class GetCompletedRoutinesByUserByTimeframe : IRequest<List<CompletedRoutine>>
+    public class GetCompletedRoutinesByUserByTimeframe : IRequest<PagedList<CompletedRoutine>>
     {
         public int TimeframeInMonths { get; set; }
         public int UserId { get; set; }
+        public PaginationFilter PaginationFilter { get; set; }
     }
 }

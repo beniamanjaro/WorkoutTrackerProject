@@ -18,4 +18,8 @@
     <ProjectReference Include="..\WorkoutTracker.Infrastructure\WorkoutTracker.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Notifications\Queries\" />
+  </ItemGroup>
+
 </Project>

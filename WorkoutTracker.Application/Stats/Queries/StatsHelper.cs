@@ -3,13 +3,15 @@ using System.Linq;
 using WorkoutTracker.Domain.Models;
 using ConsoleApp;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
+using Newtonsoft.Json.Serialization;
 
 namespace WorkoutTracker.Application.Stats.Queries
 {
     public class StatsHelper 
     {
         private List<CompletedRoutine>? _completedRoutines;
-        private List<Routine> _routines;
+        private List<Routine>? _routines;
+        private List<Exercise>? _exercises;
         private int _totalReps;
         private int _totalSets;
         private int _totalWeight;
@@ -22,8 +24,13 @@ namespace WorkoutTracker.Application.Stats.Queries
         {
             _routines = routines;
         }
+        public StatsHelper(List<Exercise> exercises)
+        {
+            _exercises = exercises;
+        }
 
-        public int GetMaxWeightByExercise(string exercise)
+
+        public double GetMaxWeightByExercise(string exercise)
         {
             var maxWeight = _completedRoutines
                   .SelectMany(cr => cr.Exercises)
@@ -62,6 +69,23 @@ namespace WorkoutTracker.Application.Stats.Queries
                 muscleSplits.Add(muscleSplit);
             }
             return muscleSplits;
+        }
+
+        public List<KeyValuePair<string, int>> GetMuscleSplitForExercises()
+        {
+            Dictionary<string, int> muscleSplit = new Dictionary<string, int>();
+
+            var groupedExercises = _exercises.GroupBy(e => e.Category);
+            var count = _exercises.Count();
+                foreach (var item in groupedExercises)
+                {
+                    var s = item.Count();
+
+                    var r = Math.Round(((double)item.Count() / count) * 100);
+                muscleSplit.Add(char.ToUpper(item.Key[0]) + item.Key.Substring(1) , (int)Math.Round(((double)item.Count() / count) * 100));
+                }
+            
+            return muscleSplit.OrderByDescending(ms => ms.Value).ToList();
         }
 
         public Dictionary<string, int> GetNumberOfExercisesCompletedByMuscleGroup()
@@ -159,9 +183,9 @@ namespace WorkoutTracker.Application.Stats.Queries
             return totalSets;
         }
 
-        public int WeigthLiftedByMuscleGroup(string muscleGroup)
+        public double WeigthLiftedByMuscleGroup(string muscleGroup)
         {
-            int totalWeight = 0;
+            double totalWeight = 0;
 
             foreach (var completedRoutine in _completedRoutines)
             {
@@ -174,9 +198,16 @@ namespace WorkoutTracker.Application.Stats.Queries
             return totalWeight;
         }
 
-        public string[] GetStats()
+        public Dictionary<string, int> GetStats()
         {
-            return new string[] { $"volume {TotalWeigthLifted()}", $"reps {TotalRepsDone()}", $"sets {TotalSetsDone()}" };
+            var dict = new Dictionary<string, int>();
+            dict["Volume"] = TotalWeigthLifted();
+            dict["Reps"] = TotalRepsDone();
+            dict["Sets"] = TotalSetsDone();
+            dict["Average Reps per Set"] = AverageRepsPerSet();
+            dict["Frequency"] = _completedRoutines.Count();
+
+            return dict;
         }
 
         public void GetStatsByMuscleGroup(string muscleGroup)

@@ -16,7 +16,8 @@
         public IEnumerable<T> Data { get; set; }
         public int? PageNumber { get; set; }
         public int? PageSize { get; set; }
-        public string NextPage { get; set; }
-        public string PreviousPage { get; set; }
+        public int? TotalPages { get; set; }
+        public bool HasNext { get; set; }
+        public bool HasPrevious { get; set; }
     }
 }

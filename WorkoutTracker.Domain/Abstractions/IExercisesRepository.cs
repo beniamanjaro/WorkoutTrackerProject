@@ -9,7 +9,8 @@ namespace WorkoutTracker.Domain.Abstractions
         Task<Exercise> GetExerciseById(int id);
         Task<List<Exercise>> GetExercisesByName(string name, PaginationFilter paginationFilter);
         Task<List<Exercise>> GetExercisesByCategory(string category, PaginationFilter paginationFilter);
-        Task<List<Exercise>> GetAllExercises(PaginationFilter paginationFilter);
+        Task<PagedList<Exercise>> GetAllExercises(PaginationFilter paginationFilter);
+        Task<List<Exercise>> GetAllExercisesWithNoPagination();
         Task<List<string>> GetExercisesCategories();
         Task<IList<ExerciseNameResponse>> GetExercisesNames();
         Task UpdateExercise(Exercise exercise);

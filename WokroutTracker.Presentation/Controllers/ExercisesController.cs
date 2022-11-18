@@ -38,7 +38,11 @@ namespace WorkoutTracker.Presentation.Controllers
             var exercises = await _mediator.Send(new GetAllExercises { PaginationFilter = paginationFilter});
             var mappedExercises = _mapper.Map<List<ExerciseGetDto>>(exercises);
 
-            var paginationResponse = new PagedResponse<ExerciseGetDto>(mappedExercises);
+            var paginationResponse = new PagedResponse<ExerciseGetDto>();
+            paginationResponse.Data = mappedExercises;
+            paginationResponse.TotalPages = exercises.TotalPages;
+            paginationResponse.HasNext = exercises.HasNext;
+            paginationResponse.HasPrevious = exercises.HasPrevious;
             paginationResponse.PageSize = paginationFilter.PageSize;
             paginationResponse.PageNumber = paginationFilter.PageNumber;
 
@@ -91,6 +95,26 @@ namespace WorkoutTracker.Presentation.Controllers
             _logger.LogInformation("Successfully retrieved the exercise");
 
             var mappedExercise = _mapper.Map<ExerciseGetDto>(exercise);
+            return Ok(mappedExercise);
+        }
+
+        [HttpGet]
+        [Route("{exerciseId}/similar-exercises")]
+        public async Task<IActionResult> GetSimilarExercises(int exerciseId)
+        {
+            _logger.LogInformation("Gettting exercise by id");
+
+            var exercises = await _mediator.Send(new GetSimilarExercises { ExerciseId = exerciseId });
+            if (exercises == null)
+            {
+                _logger.LogError("Coulnd't find the exercise with the id, {0}", exerciseId);
+
+                return NotFound();
+            }
+
+            _logger.LogInformation("Successfully retrieved the exercise");
+
+            var mappedExercise = _mapper.Map<List<ExerciseGetDto>>(exercises);
             return Ok(mappedExercise);
         }
 

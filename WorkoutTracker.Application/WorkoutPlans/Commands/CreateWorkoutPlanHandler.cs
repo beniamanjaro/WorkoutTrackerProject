@@ -21,10 +21,12 @@ namespace WorkoutTracker.Application.WorkoutPlans.Commands
         public async Task<WorkoutPlan> Handle(CreateWorkoutPlan request, CancellationToken cancellationToken)
         {
             var savedWorkoutPlan = await _unitOfWork.WorkoutPlansRepository.AddWorkoutPlan(new WorkoutPlan
-            { UserId = request.UserId,
+            {
+                UserId = request.UserId,
                 Name = request.Name,
                 TimesPerWeek = request.TimesPerWeek,
-                Routines = request.Routines
+                Routines = request.Routines,
+                CreatedAt = DateTime.Now
             });
             var user = await _unitOfWork.UsersRepository.GetUserById(request.UserId);
             if(user != null)

@@ -8,7 +8,7 @@ using WorkoutTracker.Domain.Models;
 
 namespace WorkoutTracker.Application.Stats.Queries
 {
-    public class GetStatsByUser : IRequest<string[]>
+    public class GetStatsByUser : IRequest<Dictionary<string, int>>
     {
         public int UserId { get; set; }
     }

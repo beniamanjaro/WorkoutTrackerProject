@@ -53,6 +53,10 @@ namespace WokroutTracker.Presentation.Controllers
             _logger.LogInformation("Getting top users for the workout plan");
 
             var result = await _mediator.Send(new GetTopUsersForWorkoutPlan() { Id = id});
+            if(result == null)
+            {
+                return NotFound();
+            }
 
             _logger.LogInformation("Successfully retrieved the users");
 
@@ -114,6 +118,36 @@ namespace WokroutTracker.Presentation.Controllers
             paginationResponse.PageNumber = paginationFilter.PageNumber;
 
             _logger.LogInformation("Successfully retrieved the workout plans");
+
+            return Ok(paginationResponse);
+        }
+
+        [HttpGet]
+        [Route("search")]
+        public async Task<IActionResult> GetWorkoutPlansBySearch([FromQuery] PaginationDto paginationData, [FromQuery] FilterSortData filterSortData, [FromQuery] string? searchValue = "")
+        {
+            _logger.LogInformation("Getting all exercises by name");
+
+            var paginationFilter = _mapper.Map<PaginationFilter>(paginationData);
+
+            var workoutPlans = await _mediator.Send(new GetFilteredSortedWorkoutPlans { SearchValue = searchValue, PaginationFilter = paginationFilter, FilterSortData = filterSortData });
+
+            if (workoutPlans == null)
+            {
+                _logger.LogError("Couldn't find any exercise with the selected name {0}", searchValue);
+                return NotFound();
+            }
+
+            var mappedWorkoutPlans = _mapper.Map<List<WorkoutPlanGetDto>>(workoutPlans);
+            var paginationResponse = new PagedResponse<WorkoutPlanGetDto>(mappedWorkoutPlans);
+            paginationResponse.Data = mappedWorkoutPlans;
+            paginationResponse.TotalPages = workoutPlans.TotalPages;
+            paginationResponse.HasNext = workoutPlans.HasNext;
+            paginationResponse.HasPrevious = workoutPlans.HasPrevious;
+            paginationResponse.PageSize = paginationFilter.PageSize;
+            paginationResponse.PageNumber = paginationFilter.PageNumber;
+
+            _logger.LogInformation("Successfully retrieved the exercises");
 
             return Ok(paginationResponse);
         }

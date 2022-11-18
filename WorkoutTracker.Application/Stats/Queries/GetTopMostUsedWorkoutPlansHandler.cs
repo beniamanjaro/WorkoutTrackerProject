@@ -6,10 +6,11 @@ using System.Text;
 using System.Threading.Tasks;
 using WorkoutTracker.Application.WorkoutPlans.Queries;
 using WorkoutTracker.Domain.Abstractions;
+using WorkoutTracker.Domain.Models;
 
 namespace WorkoutTracker.Application.Stats.Queries
 {
-    public class GetTopMostUsedWorkoutPlansHandler : IRequestHandler<GetTopMostUsedWorkoutPlans, List<string>>
+    public class GetTopMostUsedWorkoutPlansHandler : IRequestHandler<GetTopMostUsedWorkoutPlans, List<TopWorkoutPlan>>
     {
         private readonly IUnitOfWork _unitOfWork;
 
@@ -17,19 +18,20 @@ namespace WorkoutTracker.Application.Stats.Queries
         {
             _unitOfWork = unitOfWork;
         }
-        public async Task<List<string>> Handle(GetTopMostUsedWorkoutPlans request, CancellationToken cancellationToken)
+        public async Task<List<TopWorkoutPlan>> Handle(GetTopMostUsedWorkoutPlans request, CancellationToken cancellationToken)
         {
-            var result = new List<string>();
             var completedRoutines = await _unitOfWork.CompletedRoutinesRepository.GetCompletedRoutinesByUser(request.UserId);
-            var groupedExercises = completedRoutines.AsEnumerable()
-                    .GroupBy(cr => cr.WorkoutPlanName);
-            var mostUsedFiveWorkoutPlans = groupedExercises.OrderByDescending(wp => wp.Count()).Take(request.Size);
-            foreach (var ex in mostUsedFiveWorkoutPlans)
-            {
-                result.Add(ex.Key);
-            }
+            var mostUsedWorkoutPlans = completedRoutines.AsEnumerable()
+                    .GroupBy(cr => cr.WorkoutPlanId, (key,group) => new TopWorkoutPlan()
+                    {
+                        Name = group.First().WorkoutPlanName,
+                        Frequency = group.Count(),
+                        Id = key,
+                    })
+                    .OrderByDescending(wp => wp.Frequency)
+                    .Take(request.Size).ToList();
 
-            return result;
+            return mostUsedWorkoutPlans;
 
         }
     }

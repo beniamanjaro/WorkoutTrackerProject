@@ -8,7 +8,7 @@ using WorkoutTracker.Domain.Abstractions;
 
 namespace WorkoutTracker.Application.Stats.Queries
 {
-    public class GetExerciseStatsByUserHandler : IRequestHandler<GetExerciseStatsByUser, int>
+    public class GetExerciseStatsByUserHandler : IRequestHandler<GetExerciseStatsByUser, double>
     {
         private readonly IUnitOfWork _unitOfWork;
 
@@ -16,7 +16,7 @@ namespace WorkoutTracker.Application.Stats.Queries
         {
             _unitOfWork = unitOfWork;
         }
-        public async Task<int> Handle(GetExerciseStatsByUser request, CancellationToken cancellationToken)
+        public async Task<double> Handle(GetExerciseStatsByUser request, CancellationToken cancellationToken)
         {
             var completedRoutines = await _unitOfWork.CompletedRoutinesRepository.GetCompletedRoutinesByUser(request.UserId);
             if (completedRoutines.Count == 0) return 0;

@@ -12,7 +12,7 @@ namespace WorkoutTracker.Application.CompletedRoutines.Commands
     {
         public string RoutineName { get; set; }
         public string WorkoutPlanName { get; set; }
-        public int WorkoutPlanId { get; set; }
+        public int? WorkoutPlanId { get; set; }
         public DateTime CreatedAt { get; set; }
         public int UserId { get; set; }
         public int TotalVolume { get; set; }

@@ -40,10 +40,6 @@ namespace WorkoutTracker.Presentation.Controllers
             }
 
             _logger.LogError("Couldn't register the user");
-            foreach(var err in result.Errors)
-            {
-                _logger.LogError(err);
-            }
 
             return BadRequest(result);
 

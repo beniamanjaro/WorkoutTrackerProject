@@ -9,7 +9,7 @@ using WorkoutTracker.Domain.Models;
 
 namespace WorkoutTracker.Application.CompletedRoutines.Queries
 {
-    public class GetCompletedRoutinesByUserByTimeFrameHandler : IRequestHandler<GetCompletedRoutinesByUserByTimeframe, List<CompletedRoutine>>
+    public class GetCompletedRoutinesByUserByTimeFrameHandler : IRequestHandler<GetCompletedRoutinesByUserByTimeframe, PagedList<CompletedRoutine>>
     {
         private readonly IUnitOfWork _unitOfWork;
 
@@ -17,9 +17,9 @@ namespace WorkoutTracker.Application.CompletedRoutines.Queries
         {
             _unitOfWork = unitOfWork;
         }
-        public async Task<List<CompletedRoutine>> Handle(GetCompletedRoutinesByUserByTimeframe request, CancellationToken cancellationToken)
+        public async Task<PagedList<CompletedRoutine>> Handle(GetCompletedRoutinesByUserByTimeframe request, CancellationToken cancellationToken)
         {
-            var completedRoutines = await _unitOfWork.CompletedRoutinesRepository.GetCompletedRoutinesByUserByTimeframe(request.UserId, request.TimeframeInMonths);
+            var completedRoutines = await _unitOfWork.CompletedRoutinesRepository.GetCompletedRoutinesByUserByTimeframe(request.UserId, request.TimeframeInMonths, request.PaginationFilter);
 
             return completedRoutines;
         }

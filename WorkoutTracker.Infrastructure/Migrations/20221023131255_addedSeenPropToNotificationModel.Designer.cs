@@ -12,8 +12,8 @@ using WorkoutTracker.Infrastructure;
 namespace WorkoutTracker.Infrastructure.Migrations
 {
     [DbContext(typeof(WorkoutContext))]
-    [Migration("20221005111500_addedWorkoutPlanIdToCompletedRoutine")]
-    partial class addedWorkoutPlanIdToCompletedRoutine
+    [Migration("20221023131255_addedSeenPropToNotificationModel")]
+    partial class addedSeenPropToNotificationModel
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -297,7 +297,7 @@ namespace WorkoutTracker.Infrastructure.Migrations
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
-                    b.Property<int>("WorkoutPlanId")
+                    b.Property<int?>("WorkoutPlanId")
                         .HasColumnType("int");
 
                     b.Property<string>("WorkoutPlanName")
@@ -307,6 +307,8 @@ namespace WorkoutTracker.Infrastructure.Migrations
                     b.HasKey("CompletedRoutineId");
 
                     b.HasIndex("UserId");
+
+                    b.HasIndex("WorkoutPlanId");
 
                     b.ToTable("CompletedRoutines");
                 });
@@ -338,6 +340,37 @@ namespace WorkoutTracker.Infrastructure.Migrations
                     b.HasIndex("ExerciseId");
 
                     b.ToTable("CompletedRoutineExercise");
+                });
+
+            modelBuilder.Entity("WorkoutTracker.Domain.Models.Notification", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("Seen")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("WorkoutPlanId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Notification");
                 });
 
             modelBuilder.Entity("WorkoutTracker.Domain.Models.Routine", b =>
@@ -431,6 +464,9 @@ namespace WorkoutTracker.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -527,7 +563,7 @@ namespace WorkoutTracker.Infrastructure.Migrations
                     b.HasOne("WorkoutTracker.Domain.Models.WorkoutPlan", null)
                         .WithMany()
                         .HasForeignKey("WorkoutPlansId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
@@ -539,7 +575,13 @@ namespace WorkoutTracker.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("WorkoutTracker.Domain.Models.WorkoutPlan", "WorkoutPlan")
+                        .WithMany()
+                        .HasForeignKey("WorkoutPlanId");
+
                     b.Navigation("User");
+
+                    b.Navigation("WorkoutPlan");
                 });
 
             modelBuilder.Entity("WorkoutTracker.Domain.Models.CompletedRoutineExercise", b =>
@@ -559,6 +601,17 @@ namespace WorkoutTracker.Infrastructure.Migrations
                     b.Navigation("CompletedRoutine");
 
                     b.Navigation("Exercise");
+                });
+
+            modelBuilder.Entity("WorkoutTracker.Domain.Models.Notification", b =>
+                {
+                    b.HasOne("WorkoutTracker.Domain.Models.User", "User")
+                        .WithMany("Notifications")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("WorkoutTracker.Domain.Models.Routine", b =>
@@ -624,6 +677,8 @@ namespace WorkoutTracker.Infrastructure.Migrations
             modelBuilder.Entity("WorkoutTracker.Domain.Models.User", b =>
                 {
                     b.Navigation("CompletedRoutines");
+
+                    b.Navigation("Notifications");
                 });
 
             modelBuilder.Entity("WorkoutTracker.Domain.Models.WorkoutPlan", b =>

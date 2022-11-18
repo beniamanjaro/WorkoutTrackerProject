@@ -16,6 +16,7 @@ namespace WorkoutTracker.Domain.Models
         public int? SelectedWorkoutPlanId { get; set; }
         public ICollection<WorkoutPlan> WorkoutPlans { get; set; }
         public ICollection<CompletedRoutine> CompletedRoutines { get; set; }
+        public ICollection<Notification> Notifications { get; set; }
         public IdentityUser Identity {get; set;}
         public string IdentityId {get; set; }
 

@@ -58,6 +58,11 @@ namespace WorkoutTracker.Infrastructure.Repositories
                 .Take(paginationFilter.PageSize)
                 .ToListAsync();
         }
+        public async Task<List<Exercise>> GetAllExercisesWithNoPagination()
+        {
+            var exercises = await _workoutContext.Exercises.ToListAsync();
+            return exercises;
+        }
 
         public async Task<IList<ExerciseNameResponse>> GetExercisesNames()
         {
@@ -71,11 +76,11 @@ namespace WorkoutTracker.Infrastructure.Repositories
                 .Select(e => e.Category)
                 .Distinct().ToListAsync();
         }
-        public async Task<List<Exercise>> GetAllExercises(PaginationFilter paginationFilter)
+        public async Task<PagedList<Exercise>> GetAllExercises(PaginationFilter paginationFilter)
         {
-            var skip = (paginationFilter.PageNumber - 1) * paginationFilter.PageSize;
+            var exercises = await _workoutContext.Exercises.ToListAsync();
 
-            return await _workoutContext.Exercises.Skip(skip).Take(paginationFilter.PageSize).ToListAsync();
+            return PagedList<Exercise>.ToPagedList(exercises.AsQueryable(), paginationFilter.PageNumber, paginationFilter.PageSize);
         }
 
 

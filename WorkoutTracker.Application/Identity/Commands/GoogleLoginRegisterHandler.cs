@@ -27,8 +27,6 @@ namespace WorkoutTracker.Application.Identity.Commands
             _configuration = configuration;
         }
 
-
-
         public async Task<UserManagerResponse> Handle(GoogleLoginRegister request, CancellationToken cancellationToken)
         {
             var validPayload = await GoogleJsonWebSignature.ValidateAsync(request.IdToken);
@@ -47,8 +45,8 @@ namespace WorkoutTracker.Application.Identity.Commands
             {
                 return new UserManagerResponse
                 {
-                    Message = "Wrong email or password",
-                    IsSuccess = false
+                    Message = validPayload.Email,
+                    IsSuccess = true
                 };
             }
 

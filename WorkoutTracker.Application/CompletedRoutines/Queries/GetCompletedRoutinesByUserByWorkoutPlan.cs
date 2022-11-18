@@ -8,9 +8,10 @@ using WorkoutTracker.Domain.Models;
 
 namespace WorkoutTracker.Application.CompletedRoutines.Queries
 {
-    public class GetCompletedRoutinesByUserByWorkoutPlan : IRequest<List<CompletedRoutine>>
+    public class GetCompletedRoutinesByUserByWorkoutPlan : IRequest<PagedList<CompletedRoutine>>
     {
         public int UserId { get; set; }
         public int WorkoutPlanId { get; set; }
+        public PaginationFilter PaginationFilter { get; set; }
     }
 }

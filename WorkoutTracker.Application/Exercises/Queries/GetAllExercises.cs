@@ -8,7 +8,7 @@ using WorkoutTracker.Domain.Models;
 
 namespace WorkoutTracker.Application.Exercises.Queries
 {
-    public class GetAllExercises : IRequest<IEnumerable<Exercise>>
+    public class GetAllExercises : IRequest<PagedList<Exercise>>
     {
         public PaginationFilter PaginationFilter { get; set; }
     }

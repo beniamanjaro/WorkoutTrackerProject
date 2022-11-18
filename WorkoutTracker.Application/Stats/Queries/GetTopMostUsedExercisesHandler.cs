@@ -9,7 +9,7 @@ using WorkoutTracker.Domain.Models;
 
 namespace WorkoutTracker.Application.Stats.Queries
 {
-    public class GetTopMostUsedExercisesHandler : IRequestHandler<GetTopMostUsedExercises, List<string>>
+    public class GetTopMostUsedExercisesHandler : IRequestHandler<GetTopMostUsedExercises, List<TopExercise>>
     {
         private readonly IUnitOfWork _unitOfWork;
 
@@ -17,17 +17,18 @@ namespace WorkoutTracker.Application.Stats.Queries
         {
             _unitOfWork = unitOfWork;
         }
-        public async Task<List<string>> Handle(GetTopMostUsedExercises request, CancellationToken cancellationToken)
+        public async Task<List<TopExercise>> Handle(GetTopMostUsedExercises request, CancellationToken cancellationToken)
         {
-            var mostUsedExercises = new List<string>();
             var completedRoutines = await _unitOfWork.CompletedRoutinesRepository.GetCompletedRoutinesByUser(request.UserId);
-            var groupedExercises = completedRoutines.SelectMany(cr => cr.Exercises).AsEnumerable()
-                    .GroupBy(s => s.Exercise.Name);
-            var mostUsedFiveExercises = groupedExercises.OrderByDescending(e => e.Count()).Take(request.Size);
-            foreach(var ex in mostUsedFiveExercises)
-            {
-                mostUsedExercises.Add(ex.Key);
-            }
+            var mostUsedExercises = completedRoutines.SelectMany(cr => cr.Exercises).AsEnumerable()
+                    .GroupBy(s => s.Exercise.Name,
+                    (key, group) => new TopExercise()
+                    { Name = key,
+                      Frequency = group.Count(),
+                      Id = group.First().ExerciseId
+                    })
+                    .OrderByDescending(e => e.Frequency)
+                    .Take(request.Size).ToList();
 
             return mostUsedExercises;
         }
